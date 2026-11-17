@@ -1,559 +1,559 @@
-!DOCTYPE html
-html lang=zh-TW
-head
-    meta charset=UTF-8
-    meta name=viewport content=width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no
-    title鵝黃小財神・股票記帳本title
-    !-- 載入 Tailwind CSS --
-    script src=httpscdn.tailwindcss.comscript
-    !-- 載入 Google Fonts 圓體字型 (Zen Maru Gothic + Inter) --
-    link rel=preconnect href=httpsfonts.googleapis.com
-    link rel=preconnect href=httpsfonts.gstatic.com crossorigin
-    link href=httpsfonts.googleapis.comcss2family=Interwght@500;700;800&family=Zen+Maru+Gothicwght@500;700;900&display=swap rel=stylesheet
-    !-- 載入 Lucide Icons --
-    script src=httpsunpkg.comlucide@latestscript
-    style
-        root {
-            --bg-cream #FEF9E7;
-            --card-white #FFFDF7;
-            --accent-yellow #FACC15;
-            --accent-warm #FB923C;
-            --ink-brown #45322E;
-            --ink-muted #78625C;
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>鵝黃小財神・股票記帳本</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Google Fonts 圓體字型 (Zen Maru Gothic + Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- 載入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-cream: #FEF9E7;
+            --card-white: #FFFDF7;
+            --accent-yellow: #FACC15;
+            --accent-warm: #FB923C;
+            --ink-brown: #45322E;
+            --ink-muted: #78625C;
         }
 
         body {
-            font-family 'Zen Maru Gothic', 'Inter', sans-serif;
-            background-color var(--bg-cream);
-            background-image radial-gradient(#F3E5AB 1.5px, transparent 1.5px);
-            background-size 22px 22px;
-            color var(--ink-brown);
-            -webkit-tap-highlight-color transparent;
-            padding-bottom 92px;
+            font-family: 'Zen Maru Gothic', 'Inter', sans-serif;
+            background-color: var(--bg-cream);
+            background-image: radial-gradient(#F3E5AB 1.5px, transparent 1.5px);
+            background-size: 22px 22px;
+            color: var(--ink-brown);
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 92px;
         }
 
-         活潑插圖風卡片：手繪粗線條 + 硬質立體陰影 
+        /* 活潑插圖風卡片：手繪粗線條 + 硬質立體陰影 */
         .illust-card {
-            background-color var(--card-white);
-            border 2.5px solid var(--ink-brown);
-            border-radius 24px;
-            box-shadow 0 4px 0 var(--ink-brown);
-            transition transform 0.15s ease, box-shadow 0.15s ease;
+            background-color: var(--card-white);
+            border: 2.5px solid var(--ink-brown);
+            border-radius: 24px;
+            box-shadow: 0 4px 0 var(--ink-brown);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-         活潑插圖風按鈕 
+        /* 活潑插圖風按鈕 */
         .illust-btn {
-            border 2.5px solid var(--ink-brown);
-            box-shadow 0 3px 0 var(--ink-brown);
-            transition all 0.12s ease;
+            border: 2.5px solid var(--ink-brown);
+            box-shadow: 0 3px 0 var(--ink-brown);
+            transition: all 0.12s ease;
         }
 
-        .illust-btnactive {
-            transform translateY(2px);
-            box-shadow 0 1px 0 var(--ink-brown);
+        .illust-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 var(--ink-brown);
         }
 
-         插圖風輸入框 
+        /* 插圖風輸入框 */
         .illust-input {
-            background-color #FFFDF9;
-            border 2px solid #D6C7B2;
-            border-radius 14px;
-            color var(--ink-brown);
-            transition border-color 0.15s ease, box-shadow 0.15s ease;
+            background-color: #FFFDF9;
+            border: 2px solid #D6C7B2;
+            border-radius: 14px;
+            color: var(--ink-brown);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .illust-inputfocus {
-            outline none;
-            border-color var(--ink-brown);
-            box-shadow 0 0 0 3px rgba(250, 204, 21, 0.45);
+        .illust-input:focus {
+            outline: none;
+            border-color: var(--ink-brown);
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.45);
         }
 
-         台股紅賺綠虧 
+        /* 台股紅賺綠虧 */
         .profit-up {
-            color #DC2626;
+            color: #DC2626;
         }
         .profit-down {
-            color #16A34A;
+            color: #16A34A;
         }
 
-         隱藏數字輸入框預設箭頭 
-        input[type=number]-webkit-inner-spin-button,
-        input[type=number]-webkit-outer-spin-button {
-            -webkit-appearance none;
-            margin 0;
+        /* 隱藏數字輸入框預設箭頭 */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
         input[type=number] {
-            -moz-appearance textfield;
+            -moz-appearance: textfield;
         }
 
-         可愛漂浮動畫 
+        /* 可愛漂浮動畫 */
         @keyframes floatSlow {
-            0%, 100% { transform translateY(0px) rotate(0deg); }
-            50% { transform translateY(-4px) rotate(2deg); }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-4px) rotate(2deg); }
         }
         .animate-float {
-            animation floatSlow 3.2s ease-in-out infinite;
+            animation: floatSlow 3.2s ease-in-out infinite;
         }
 
         @keyframes spinOnce {
-            from { transform rotate(0deg); }
-            to { transform rotate(360deg); }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         .animate-spin-fast {
-            animation spinOnce 0.8s linear infinite;
+            animation: spinOnce 0.8s linear infinite;
         }
-    style
-head
-body class=antialiased selectionbg-amber-200
+    </style>
+</head>
+<body class="antialiased selection:bg-amber-200">
 
-    !-- 提示訊息 Toast --
-    div id=toast-container class=fixed top-4 left-12 -translate-x-12 z-50 w-[90%] max-w-sm pointer-events-none flex flex-col gap-2div
+    <!-- 提示訊息 Toast -->
+    <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm pointer-events-none flex flex-col gap-2"></div>
 
-    !-- ========================================== --
-    !-- 頂部置頂區：插圖標題 + 快速手續費設定 --
-    !-- ========================================== --
-    header class=sticky top-0 z-30 bg-[#FEF9E7]95 backdrop-blur-md pt-3 pb-3 px-4 border-b-2 border-[#E6D8C3]
-        div class=max-w-lg mx-auto
-            !-- 品牌插圖列 + 手續費折數按鈕 --
-            div class=flex items-center justify-between
-                div class=flex items-center gap-2.5
-                    !-- 可愛手繪小財神貓咪 SVG 插圖 --
-                    div class=w-11 h-11 rounded-2xl bg-[#FDE047] border-2 border-[#45322E] flex items-center justify-center shadow-[0_2px_0_#45322E] animate-float shrink-0
-                        svg viewBox=0 0 64 64 class=w-9 h-9
-                            polygon points=14,26 18,10 28,20 fill=#FDE047 stroke=#45322E stroke-width=3 stroke-linejoin=round
-                            polygon points=50,26 46,10 36,20 fill=#FDE047 stroke=#45322E stroke-width=3 stroke-linejoin=round
-                            ellipse cx=32 cy=36 rx=21 ry=18 fill=#FFFDF7 stroke=#45322E stroke-width=3
-                            circle cx=24 cy=34 r=2.5 fill=#45322E
-                            circle cx=40 cy=34 r=2.5 fill=#45322E
-                            ellipse cx=18 cy=39 rx=3.5 ry=2 fill=#FDA4AF opacity=0.8
-                            ellipse cx=46 cy=39 rx=3.5 ry=2 fill=#FDA4AF opacity=0.8
-                            path d=M29 38 Q32 41 35 38 fill=none stroke=#45322E stroke-width=2.5 stroke-linecap=round
-                            circle cx=32 cy=21 r=6 fill=#FACC15 stroke=#45322E stroke-width=2.5
-                            text x=32 y=24 text-anchor=middle font-size=8 font-weight=900 fill=#45322E$text
-                        svg
-                    div
-                    div
-                        h1 class=text-lg smtext-xl font-black tracking-tight text-[#45322E] leading-tight鵝黃小財神記帳本h1
-                        p class=text-[11px] font-bold text-[#78625C]輕鬆記買賣・含稅費淨賺賠 ✨p
-                    div
-                div
-                button onclick=openFeeSettingsModal()
-                    class=illust-btn bg-white hoverbg-amber-50 text-[#45322E] text-[11px] font-black px-2.5 py-1.5 rounded-full flex items-center gap-1 cursor-pointer
-                    span⚙️span
-                    span id=header-discount-label手續費6折span
-                button
-            div
-        div
-    header
+    <!-- ========================================== -->
+    <!-- 頂部置頂區：插圖標題 + 快速手續費設定 -->
+    <!-- ========================================== -->
+    <header class="sticky top-0 z-30 bg-[#FEF9E7]/95 backdrop-blur-md pt-3 pb-3 px-4 border-b-2 border-[#E6D8C3]">
+        <div class="max-w-lg mx-auto">
+            <!-- 品牌插圖列 + 手續費折數按鈕 -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <!-- 可愛手繪小財神貓咪 SVG 插圖 -->
+                    <div class="w-11 h-11 rounded-2xl bg-[#FDE047] border-2 border-[#45322E] flex items-center justify-center shadow-[0_2px_0_#45322E] animate-float shrink-0">
+                        <svg viewBox="0 0 64 64" class="w-9 h-9">
+                            <polygon points="14,26 18,10 28,20" fill="#FDE047" stroke="#45322E" stroke-width="3" stroke-linejoin="round"/>
+                            <polygon points="50,26 46,10 36,20" fill="#FDE047" stroke="#45322E" stroke-width="3" stroke-linejoin="round"/>
+                            <ellipse cx="32" cy="36" rx="21" ry="18" fill="#FFFDF7" stroke="#45322E" stroke-width="3"/>
+                            <circle cx="24" cy="34" r="2.5" fill="#45322E"/>
+                            <circle cx="40" cy="34" r="2.5" fill="#45322E"/>
+                            <ellipse cx="18" cy="39" rx="3.5" ry="2" fill="#FDA4AF" opacity="0.8"/>
+                            <ellipse cx="46" cy="39" rx="3.5" ry="2" fill="#FDA4AF" opacity="0.8"/>
+                            <path d="M29 38 Q32 41 35 38" fill="none" stroke="#45322E" stroke-width="2.5" stroke-linecap="round"/>
+                            <circle cx="32" cy="21" r="6" fill="#FACC15" stroke="#45322E" stroke-width="2.5"/>
+                            <text x="32" y="24" text-anchor="middle" font-size="8" font-weight="900" fill="#45322E">$</text>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-black tracking-tight text-[#45322E] leading-tight">鵝黃小財神記帳本</h1>
+                        <p class="text-[11px] font-bold text-[#78625C]">輕鬆記買賣・含稅費淨賺賠 ✨</p>
+                    </div>
+                </div>
+                <button onclick="openFeeSettingsModal()"
+                    class="illust-btn bg-white hover:bg-amber-50 text-[#45322E] text-[11px] font-black px-2.5 py-1.5 rounded-full flex items-center gap-1 cursor-pointer">
+                    <span>⚙️</span>
+                    <span id="header-discount-label">手續費6折</span>
+                </button>
+            </div>
+        </div>
+    </header>
 
-    !-- ========================================== --
-    !-- 手機主內容容器 --
-    !-- ========================================== --
-    main class=max-w-lg mx-auto px-4 pt-4 space-y-6
+    <!-- ========================================== -->
+    <!-- 手機主內容容器 -->
+    <!-- ========================================== -->
+    <main class="max-w-lg mx-auto px-4 pt-4 space-y-6">
 
-        !-- 區塊 1：單筆輸入 (股票代號自動連結股票、時間、股數、金額、手續費、總購買金額) --
-        section id=section-add class=illust-card p-4 smp-5 relative
-            div class=flex items-center justify-between mb-3.5
-                div class=flex items-center gap-2
-                    span class=w-7 h-7 rounded-full bg-[#FDE047] border-2 border-[#45322E] flex items-center justify-center text-sm font-black✏️span
-                    h2 class=text-base smtext-lg font-black text-[#45322E]新增單筆購買h2
-                div
-                span class=text-[11px] font-bold text-[#78625C] bg-[#FEF9E7] px-2.5 py-1 rounded-full border border-[#E6D8C3]輸入代號自動帶出名稱span
-            div
+        <!-- 區塊 1：單筆輸入 (股票代號自動連結股票、時間、股數、金額、手續費、總購買金額) -->
+        <section id="section-add" class="illust-card p-4 sm:p-5 relative">
+            <div class="flex items-center justify-between mb-3.5">
+                <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-full bg-[#FDE047] border-2 border-[#45322E] flex items-center justify-center text-sm font-black">✏️</span>
+                    <h2 class="text-base sm:text-lg font-black text-[#45322E]">新增單筆購買</h2>
+                </div>
+                <span class="text-[11px] font-bold text-[#78625C] bg-[#FEF9E7] px-2.5 py-1 rounded-full border border-[#E6D8C3]">輸入代號自動帶出名稱</span>
+            </div>
 
-            form id=buy-form class=space-y-3
-                !-- 第一列：代號 + 股票 (輸入代號自動帶出股票名稱) --
-                div class=grid grid-cols-12 gap-2.5
-                    div class=col-span-5
-                        label class=block text-xs font-bold text-[#45322E] mb-1🔍 股票代號 label
-                        input type=text id=buy-code required placeholder=如 0050 autocomplete=off
-                            class=illust-input w-full px-3 py-2.5 text-sm font-black uppercase
-                    div
-                    div class=col-span-7
-                        div class=flex items-center justify-between mb-1
-                            label class=block text-xs font-bold text-[#45322E]📌 股票 label
-                            span id=code-lookup-status class=text-[10px] font-bold text-amber-600 hidden搜尋中...span
-                        div
-                        input type=text id=buy-name required placeholder=自動帶出或手動輸入
-                            class=illust-input w-full px-3 py-2.5 text-sm font-bold
-                    div
-                div
+            <form id="buy-form" class="space-y-3">
+                <!-- 第一列：代號 + 股票 (輸入代號自動帶出股票名稱) -->
+                <div class="grid grid-cols-12 gap-2.5">
+                    <div class="col-span-5">
+                        <label class="block text-xs font-bold text-[#45322E] mb-1">🔍 股票代號 *</label>
+                        <input type="text" id="buy-code" required placeholder="如: 0050" autocomplete="off"
+                            class="illust-input w-full px-3 py-2.5 text-sm font-black uppercase">
+                    </div>
+                    <div class="col-span-7">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-[#45322E]">📌 股票 *</label>
+                            <span id="code-lookup-status" class="text-[10px] font-bold text-amber-600 hidden">搜尋中...</span>
+                        </div>
+                        <input type="text" id="buy-name" required placeholder="自動帶出或手動輸入"
+                            class="illust-input w-full px-3 py-2.5 text-sm font-bold">
+                    </div>
+                </div>
 
-                !-- 第二列：購買時間 (日期表) --
-                div
-                    label class=block text-xs font-bold text-[#45322E] mb-1📅 購買時間 label
-                    input type=date id=buy-date required
-                        class=illust-input w-full px-3.5 py-2.5 text-sm font-bold
-                div
+                <!-- 第二列：購買時間 (日期表) -->
+                <div>
+                    <label class="block text-xs font-bold text-[#45322E] mb-1">📅 購買時間 *</label>
+                    <input type="date" id="buy-date" required
+                        class="illust-input w-full px-3.5 py-2.5 text-sm font-bold">
+                </div>
 
-                !-- 第三列：購買股數 + 購買金額(單價) --
-                div class=grid grid-cols-2 gap-3
-                    div
-                        label class=block text-xs font-bold text-[#45322E] mb-1🔢 購買股數 label
-                        input type=number id=buy-shares required min=0.0001 step=any inputmode=decimal placeholder=如 1000
-                            class=illust-input w-full px-3.5 py-2.5 text-sm font-bold
-                    div
-                    div
-                        label class=block text-xs font-bold text-[#45322E] mb-1🏷️ 購買金額 (單價) label
-                        input type=number id=buy-price required min=0.0001 step=any inputmode=decimal placeholder=如 980
-                            class=illust-input w-full px-3.5 py-2.5 text-sm font-bold
-                    div
-                div
+                <!-- 第三列：購買股數 + 購買金額(單價) -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-[#45322E] mb-1">🔢 購買股數 *</label>
+                        <input type="number" id="buy-shares" required min="0.0001" step="any" inputmode="decimal" placeholder="如: 1000"
+                            class="illust-input w-full px-3.5 py-2.5 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[#45322E] mb-1">🏷️ 購買金額 (單價) *</label>
+                        <input type="number" id="buy-price" required min="0.0001" step="any" inputmode="decimal" placeholder="如: 980"
+                            class="illust-input w-full px-3.5 py-2.5 text-sm font-bold">
+                    </div>
+                </div>
 
-                !-- 第四列：買進手續費 (自動計算，若無可填0忽略) --
-                div class=bg-[#FFFBEB] border border-[#E6D8C3] rounded-2xl p-3 flex items-center justify-between gap-3
-                    div
-                        label class=block text-xs font-bold text-[#45322E]🧾 買進手續費 (無則填 0)label
-                        span class=text-[10px] text-[#78625C]依代號自動試算，可手動修改span
-                    div
-                    div class=flex items-center gap-1 w-28 smw-32
-                        span class=text-xs font-black text-amber-700$span
-                        input type=number id=buy-fee min=0 step=any inputmode=decimal placeholder=0
-                            class=illust-input w-full px-2.5 py-1.5 text-sm font-bold text-right bg-white
-                    div
-                div
+                <!-- 第四列：買進手續費 (自動計算，若無可填0忽略) -->
+                <div class="bg-[#FFFBEB] border border-[#E6D8C3] rounded-2xl p-3 flex items-center justify-between gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-[#45322E]">🧾 買進手續費 (無則填 0)</label>
+                        <span class="text-[10px] text-[#78625C]">依代號自動試算，可手動修改</span>
+                    </div>
+                    <div class="flex items-center gap-1 w-28 sm:w-32">
+                        <span class="text-xs font-black text-amber-700">$</span>
+                        <input type="number" id="buy-fee" min="0" step="any" inputmode="decimal" placeholder="0"
+                            class="illust-input w-full px-2.5 py-1.5 text-sm font-bold text-right bg-white">
+                    </div>
+                </div>
 
-                !-- 第五列：總購買金額預覽 + 送出按鈕 --
-                div class=bg-[#FEF3C7] border-2 border-[#45322E] rounded-2xl p-3.5 flex flex-col smflex-row smitems-center justify-between gap-3
-                    div
-                        span class=text-xs font-bold text-[#78625C] block總購買金額 (股數 × 金額)span
-                        div class=text-xl font-black text-[#45322E]
-                            $ span id=preview-buy-total0span
-                        div
-                    div
-                    button type=submit
-                        class=illust-btn bg-[#FB923C] hoverbg-[#F97316] text-white font-black text-sm px-6 py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer w-full smw-auto
-                        i data-lucide=plus-circle class=w-4 h-4i
-                        span記下一筆！span
-                    button
-                div
-            form
-        section
+                <!-- 第五列：總購買金額預覽 + 送出按鈕 -->
+                <div class="bg-[#FEF3C7] border-2 border-[#45322E] rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <span class="text-xs font-bold text-[#78625C] block">總購買金額 (股數 × 金額)</span>
+                        <div class="text-xl font-black text-[#45322E]">
+                            $ <span id="preview-buy-total">0</span>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="illust-btn bg-[#FB923C] hover:bg-[#F97316] text-white font-black text-sm px-6 py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>記下一筆！</span>
+                    </button>
+                </div>
+            </form>
+        </section>
 
-        !-- 區塊 2：每張股票目前平均股價、現在股價、目前賺虧金額 + 一鍵更新股價 --
-        section id=section-holdings class=space-y-3
-            div class=flex items-center justify-between px-1 gap-2
-                div class=flex items-center gap-2
-                    span class=w-7 h-7 rounded-full bg-[#FDE047] border-2 border-[#45322E] flex items-center justify-center text-sm font-black📊span
-                    div
-                        h2 class=text-base smtext-lg font-black text-[#45322E] leading-tight目前持股與賺虧試算h2
-                        span id=last-price-update-time class=text-[10px] font-bold text-[#78625C] block可自動搜尋或手動輸入現價span
-                    div
-                div
-                !-- 一鍵重新整理並自動搜尋目前股價按鈕 --
-                button id=refresh-prices-btn onclick=autoFetchCurrentPrices()
-                    class=illust-btn bg-[#FDE047] hoverbg-[#FACC15] text-[#45322E] font-black text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 shrink-0 cursor-pointer
-                    i id=refresh-prices-icon data-lucide=refresh-cw class=w-3.5 h-3.5i
-                    span id=refresh-prices-text一鍵更新股價span
-                button
-            div
+        <!-- 區塊 2：每張股票目前平均股價、現在股價、目前賺虧金額 + 一鍵更新股價 -->
+        <section id="section-holdings" class="space-y-3">
+            <div class="flex items-center justify-between px-1 gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-full bg-[#FDE047] border-2 border-[#45322E] flex items-center justify-center text-sm font-black">📊</span>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-black text-[#45322E] leading-tight">目前持股與賺虧試算</h2>
+                        <span id="last-price-update-time" class="text-[10px] font-bold text-[#78625C] block">可自動搜尋或手動輸入現價</span>
+                    </div>
+                </div>
+                <!-- 一鍵重新整理並自動搜尋目前股價按鈕 -->
+                <button id="refresh-prices-btn" onclick="autoFetchCurrentPrices()"
+                    class="illust-btn bg-[#FDE047] hover:bg-[#FACC15] text-[#45322E] font-black text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 shrink-0 cursor-pointer">
+                    <i id="refresh-prices-icon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span id="refresh-prices-text">一鍵更新股價</span>
+                </button>
+            </div>
 
-            !-- 持股卡片動態渲染區 --
-            div id=holdings-list class=space-y-3
-                !-- JS 動態生成 --
-            div
-        section
+            <!-- 持股卡片動態渲染區 -->
+            <div id="holdings-list" class="space-y-3">
+                <!-- JS 動態生成 -->
+            </div>
+        </section>
 
-        !-- 區塊 3：單筆買入與賣出結算明細 (含手續費及管理費證交稅與淨盈餘) --
-        section id=section-history class=space-y-3
-            div class=flex items-center justify-between px-1
-                div class=flex items-center gap-2
-                    span class=w-7 h-7 rounded-full bg-[#FDE047] border-2 border-[#45322E] flex items-center justify-center text-sm font-black📒span
-                    h2 class=text-base smtext-lg font-black text-[#45322E]買賣紀錄與盈餘明細h2
-                div
-                span id=tx-count-badge class=text-xs font-black bg-[#FDE047] border-2 border-[#45322E] px-2.5 py-0.5 rounded-full共 0 筆span
-            div
+        <!-- 區塊 3：單筆買入與賣出結算明細 (含手續費及管理費/證交稅與淨盈餘) -->
+        <section id="section-history" class="space-y-3">
+            <div class="flex items-center justify-between px-1">
+                <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-full bg-[#FDE047] border-2 border-[#45322E] flex items-center justify-center text-sm font-black">📒</span>
+                    <h2 class="text-base sm:text-lg font-black text-[#45322E]">買賣紀錄與盈餘明細</h2>
+                </div>
+                <span id="tx-count-badge" class="text-xs font-black bg-[#FDE047] border-2 border-[#45322E] px-2.5 py-0.5 rounded-full">共 0 筆</span>
+            </div>
 
-            !-- 交易卡片動態渲染區 --
-            div id=transactions-list class=space-y-3.5
-                !-- JS 動態生成 --
-            div
-        section
+            <!-- 交易卡片動態渲染區 -->
+            <div id="transactions-list" class="space-y-3.5">
+                <!-- JS 動態生成 -->
+            </div>
+        </section>
 
-    main
+    </main>
 
-    !-- ========================================== --
-    !-- 手機底部快捷導覽列 --
-    !-- ========================================== --
-    nav class=fixed bottom-0 inset-x-0 z-30 bg-[#FFFDF7]95 backdrop-blur-md border-t-2 border-[#45322E] px-4 py-2
-        div class=max-w-lg mx-auto grid grid-cols-3 gap-2
-            button onclick=scrollToSection('section-add')
-                class=flex flex-col items-center justify-center py-1.5 rounded-xl hoverbg-[#FEF08A] activebg-[#FDE047] text-[#45322E] font-bold text-xs cursor-pointer
-                i data-lucide=pen-tool class=w-4 h-4 mb-0.5i
-                span記一筆span
-            button
-            button onclick=scrollToSection('section-holdings')
-                class=flex flex-col items-center justify-center py-1.5 rounded-xl hoverbg-[#FEF08A] activebg-[#FDE047] text-[#45322E] font-bold text-xs cursor-pointer
-                i data-lucide=pie-chart class=w-4 h-4 mb-0.5i
-                span持股賺虧span
-            button
-            button onclick=scrollToSection('section-history')
-                class=flex flex-col items-center justify-center py-1.5 rounded-xl hoverbg-[#FEF08A] activebg-[#FDE047] text-[#45322E] font-bold text-xs cursor-pointer
-                i data-lucide=receipt class=w-4 h-4 mb-0.5i
-                span買賣明細span
-            button
-        div
-    nav
+    <!-- ========================================== -->
+    <!-- 手機底部快捷導覽列 -->
+    <!-- ========================================== -->
+    <nav class="fixed bottom-0 inset-x-0 z-30 bg-[#FFFDF7]/95 backdrop-blur-md border-t-2 border-[#45322E] px-4 py-2">
+        <div class="max-w-lg mx-auto grid grid-cols-3 gap-2">
+            <button onclick="scrollToSection('section-add')"
+                class="flex flex-col items-center justify-center py-1.5 rounded-xl hover:bg-[#FEF08A] active:bg-[#FDE047] text-[#45322E] font-bold text-xs cursor-pointer">
+                <i data-lucide="pen-tool" class="w-4 h-4 mb-0.5"></i>
+                <span>記一筆</span>
+            </button>
+            <button onclick="scrollToSection('section-holdings')"
+                class="flex flex-col items-center justify-center py-1.5 rounded-xl hover:bg-[#FEF08A] active:bg-[#FDE047] text-[#45322E] font-bold text-xs cursor-pointer">
+                <i data-lucide="pie-chart" class="w-4 h-4 mb-0.5"></i>
+                <span>持股賺虧</span>
+            </button>
+            <button onclick="scrollToSection('section-history')"
+                class="flex flex-col items-center justify-center py-1.5 rounded-xl hover:bg-[#FEF08A] active:bg-[#FDE047] text-[#45322E] font-bold text-xs cursor-pointer">
+                <i data-lucide="receipt" class="w-4 h-4 mb-0.5"></i>
+                <span>買賣明細</span>
+            </button>
+        </div>
+    </nav>
 
-    !-- ========================================== --
-    !-- 登記賣出與稅費盈餘結算 Modal 視窗 --
-    !-- ========================================== --
-    div id=sell-modal class=fixed inset-0 z-50 hidden bg-[#45322E]60 backdrop-blur-xs flex items-end smitems-center justify-center p-0 smp-4
-        div class=bg-[#FFFDF7] border-t-[3px] smborder-[3px] border-[#45322E] rounded-t-3xl smrounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-[slideUp_0.2s_ease-out] max-h-[92vh] overflow-y-auto
-            !-- Modal 標頭 --
-            div class=bg-[#FDE047] px-5 py-3.5 border-b-2 border-[#45322E] flex items-center justify-between sticky top-0 z-10
-                div class=flex items-center gap-2
-                    span class=text-lg💸span
-                    h3 class=text-base font-black text-[#45322E]登記賣出與盈餘結算h3
-                div
-                button onclick=closeSellModal() class=w-8 h-8 rounded-full bg-white border-2 border-[#45322E] flex items-center justify-center text-[#45322E] cursor-pointer
-                    i data-lucide=x class=w-4 h-4i
-                button
-            div
+    <!-- ========================================== -->
+    <!-- 登記賣出與稅費盈餘結算 Modal 視窗 -->
+    <!-- ========================================== -->
+    <div id="sell-modal" class="fixed inset-0 z-50 hidden bg-[#45322E]/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-[#FFFDF7] border-t-[3px] sm:border-[3px] border-[#45322E] rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-[slideUp_0.2s_ease-out] max-h-[92vh] overflow-y-auto">
+            <!-- Modal 標頭 -->
+            <div class="bg-[#FDE047] px-5 py-3.5 border-b-2 border-[#45322E] flex items-center justify-between sticky top-0 z-10">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">💸</span>
+                    <h3 class="text-base font-black text-[#45322E]">登記賣出與盈餘結算</h3>
+                </div>
+                <button onclick="closeSellModal()" class="w-8 h-8 rounded-full bg-white border-2 border-[#45322E] flex items-center justify-center text-[#45322E] cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
 
-            form id=sell-form class=p-5 space-y-3.5
-                input type=hidden id=sell-tx-id
+            <form id="sell-form" class="p-5 space-y-3.5">
+                <input type="hidden" id="sell-tx-id">
 
-                !-- 原始購買摘要 --
-                div class=bg-[#FEF9E7] border-2 border-[#E6D8C3] rounded-2xl p-3 text-xs space-y-1
-                    div class=flex justify-between
-                        span class=text-[#78625C] font-bold股票：span
-                        span id=modal-stock-name class=font-black text-[#45322E]-span
-                    div
-                    div class=flex justify-between
-                        span class=text-[#78625C] font-bold原買入資訊：span
-                        span class=font-bold text-[#45322E]span id=modal-buy-date-span  span id=modal-buy-shares0span股 @ $span id=modal-buy-price0spanspan
-                    div
-                    div class=flex justify-between
-                        span class=text-[#78625C] font-bold總購買金額：span
-                        span class=font-black text-[#45322E]$span id=modal-buy-total0spanspan
-                    div
-                div
+                <!-- 原始購買摘要 -->
+                <div class="bg-[#FEF9E7] border-2 border-[#E6D8C3] rounded-2xl p-3 text-xs space-y-1">
+                    <div class="flex justify-between">
+                        <span class="text-[#78625C] font-bold">股票：</span>
+                        <span id="modal-stock-name" class="font-black text-[#45322E]">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-[#78625C] font-bold">原買入資訊：</span>
+                        <span class="font-bold text-[#45322E]"><span id="modal-buy-date">-</span> / <span id="modal-buy-shares">0</span>股 @ $<span id="modal-buy-price">0</span></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-[#78625C] font-bold">總購買金額：</span>
+                        <span class="font-black text-[#45322E]">$<span id="modal-buy-total">0</span></span>
+                    </div>
+                </div>
 
-                !-- 賣出時間與股數 --
-                div class=grid grid-cols-2 gap-3
-                    div
-                        label class=block text-xs font-bold text-[#45322E] mb-1📅 賣出時間 label
-                        input type=date id=sell-date required class=illust-input w-full px-3 py-2 text-sm font-bold
-                    div
-                    div
-                        div class=flex justify-between items-center mb-1
-                            label class=block text-xs font-bold text-[#45322E]🔢 賣出股數 label
-                            button type=button onclick=fillAllShares() class=text-[11px] font-black text-[#FB923C] underline cursor-pointer全部賣出button
-                        div
-                        input type=number id=sell-shares required min=0.0001 step=any inputmode=decimal
-                            class=illust-input w-full px-3 py-2 text-sm font-bold
-                    div
-                div
+                <!-- 賣出時間與股數 -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-[#45322E] mb-1">📅 賣出時間 *</label>
+                        <input type="date" id="sell-date" required class="illust-input w-full px-3 py-2 text-sm font-bold">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-bold text-[#45322E]">🔢 賣出股數 *</label>
+                            <button type="button" onclick="fillAllShares()" class="text-[11px] font-black text-[#FB923C] underline cursor-pointer">全部賣出</button>
+                        </div>
+                        <input type="number" id="sell-shares" required min="0.0001" step="any" inputmode="decimal"
+                            class="illust-input w-full px-3 py-2 text-sm font-bold">
+                    </div>
+                </div>
 
-                !-- 賣出金額(單價) --
-                div
-                    label class=block text-xs font-bold text-[#45322E] mb-1🏷️ 賣出金額 (單價) label
-                    input type=number id=sell-price required min=0.0001 step=any inputmode=decimal placeholder=輸入賣出成交單價
-                        class=illust-input w-full px-3.5 py-2.5 text-sm font-bold
-                div
+                <!-- 賣出金額(單價) -->
+                <div>
+                    <label class="block text-xs font-bold text-[#45322E] mb-1">🏷️ 賣出金額 (單價) *</label>
+                    <input type="number" id="sell-price" required min="0.0001" step="any" inputmode="decimal" placeholder="輸入賣出成交單價"
+                        class="illust-input w-full px-3.5 py-2.5 text-sm font-bold">
+                </div>
 
-                !-- 賣出手續費與證交稅管理費 (自動帶入，無則填0忽略) --
-                div class=grid grid-cols-2 gap-3 bg-[#FFFBEB] border border-[#E6D8C3] rounded-2xl p-3
-                    div
-                        label class=block text-[11px] font-bold text-[#45322E] mb-1🧾 賣出手續費label
-                        div class=flex items-center gap-1
-                            span class=text-xs font-bold text-[#78625C]$span
-                            input type=number id=sell-fee min=0 step=any inputmode=decimal placeholder=0
-                                class=illust-input w-full px-2.5 py-1.5 text-sm font-bold bg-white
-                        div
-                    div
-                    div
-                        div class=flex items-center justify-between mb-1
-                            label class=block text-[11px] font-bold text-[#45322E]🏛️ 證交稅管理費label
-                            span id=modal-tax-rate-badge class=text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded0.3%span
-                        div
-                        div class=flex items-center gap-1
-                            span class=text-xs font-bold text-[#78625C]$span
-                            input type=number id=sell-tax min=0 step=any inputmode=decimal placeholder=0
-                                class=illust-input w-full px-2.5 py-1.5 text-sm font-bold bg-white
-                        div
-                    div
-                div
+                <!-- 賣出手續費與證交稅/管理費 (自動帶入，無則填0忽略) -->
+                <div class="grid grid-cols-2 gap-3 bg-[#FFFBEB] border border-[#E6D8C3] rounded-2xl p-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-[#45322E] mb-1">🧾 賣出手續費</label>
+                        <div class="flex items-center gap-1">
+                            <span class="text-xs font-bold text-[#78625C]">$</span>
+                            <input type="number" id="sell-fee" min="0" step="any" inputmode="decimal" placeholder="0"
+                                class="illust-input w-full px-2.5 py-1.5 text-sm font-bold bg-white">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-[11px] font-bold text-[#45322E]">🏛️ 證交稅/管理費</label>
+                            <span id="modal-tax-rate-badge" class="text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">0.3%</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-xs font-bold text-[#78625C]">$</span>
+                            <input type="number" id="sell-tax" min="0" step="any" inputmode="decimal" placeholder="0"
+                                class="illust-input w-full px-2.5 py-1.5 text-sm font-bold bg-white">
+                        </div>
+                    </div>
+                </div>
 
-                !-- 即時計算：總賣出金額、各項費用與淨盈餘 --
-                div class=bg-[#FEF3C7] border-2 border-[#45322E] rounded-2xl p-3.5 space-y-2
-                    div class=flex justify-between items-center text-xs font-bold
-                        span class=text-[#78625C]總賣出金額 (賣出股數×金額)：span
-                        span class=text-base font-black text-[#45322E]$ span id=modal-preview-sell-total0spanspan
-                    div
-                    div id=modal-fees-row class=flex justify-between items-center text-[11px] font-bold text-amber-800
-                        span扣除總費用 (買進手續費+賣出稅費)：span
-                        span-$ span id=modal-preview-total-fees0spanspan
-                    div
-                    div class=border-t border-amber-300 pt-2 flex justify-between items-center
-                        div
-                            span class=text-xs font-black text-[#45322E] block結算淨盈餘 (含費用)：span
-                            span id=modal-profit-formula-note class=text-[10px] text-[#78625C]span
-                        div
-                        span id=modal-preview-profit class=font-black text-lg$ 0span
-                    div
-                div
+                <!-- 即時計算：總賣出金額、各項費用與淨盈餘 -->
+                <div class="bg-[#FEF3C7] border-2 border-[#45322E] rounded-2xl p-3.5 space-y-2">
+                    <div class="flex justify-between items-center text-xs font-bold">
+                        <span class="text-[#78625C]">總賣出金額 (賣出股數×金額)：</span>
+                        <span class="text-base font-black text-[#45322E]">$ <span id="modal-preview-sell-total">0</span></span>
+                    </div>
+                    <div id="modal-fees-row" class="flex justify-between items-center text-[11px] font-bold text-amber-800">
+                        <span>扣除總費用 (買進手續費+賣出稅費)：</span>
+                        <span>-$ <span id="modal-preview-total-fees">0</span></span>
+                    </div>
+                    <div class="border-t border-amber-300 pt-2 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-black text-[#45322E] block">結算淨盈餘 (含費用)：</span>
+                            <span id="modal-profit-formula-note" class="text-[10px] text-[#78625C]"></span>
+                        </div>
+                        <span id="modal-preview-profit" class="font-black text-lg">$ 0</span>
+                    </div>
+                </div>
 
-                !-- 底部按鈕 --
-                div class=flex items-center gap-2 pt-1
-                    button type=button id=clear-sell-btn onclick=clearSellRecord()
-                        class=hidden illust-btn bg-rose-100 hoverbg-rose-200 text-rose-700 font-black text-xs px-3.5 py-3 rounded-xl cursor-pointer
+                <!-- 底部按鈕 -->
+                <div class="flex items-center gap-2 pt-1">
+                    <button type="button" id="clear-sell-btn" onclick="clearSellRecord()"
+                        class="hidden illust-btn bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-xs px-3.5 py-3 rounded-xl cursor-pointer">
                         清除賣出
-                    button
-                    button type=submit
-                        class=flex-1 illust-btn bg-[#FB923C] hoverbg-[#F97316] text-white font-black text-sm py-3 rounded-xl cursor-pointer
+                    </button>
+                    <button type="submit"
+                        class="flex-1 illust-btn bg-[#FB923C] hover:bg-[#F97316] text-white font-black text-sm py-3 rounded-xl cursor-pointer">
                         儲存賣出紀錄 ✨
-                    button
-                div
-            form
-        div
-    div
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    !-- 手續費折數設定 Modal --
-    div id=fee-settings-modal class=fixed inset-0 z-50 hidden bg-[#45322E]60 backdrop-blur-xs flex items-center justify-center p-4
-        div class=bg-[#FFFDF7] border-[3px] border-[#45322E] rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl
-            div class=bg-[#FDE047] px-5 py-3.5 border-b-2 border-[#45322E] flex items-center justify-between
-                div class=flex items-center gap-2
-                    span class=text-lg⚙️span
-                    h3 class=text-base font-black text-[#45322E]券商手續費折數設定h3
-                div
-                button onclick=closeFeeSettingsModal() class=w-7 h-7 rounded-full bg-white border-2 border-[#45322E] flex items-center justify-center text-[#45322E] cursor-pointer
-                    i data-lucide=x class=w-4 h-4i
-                button
-            div
-            div class=p-5 space-y-4
-                p class=text-xs text-[#78625C] leading-relaxed
-                    台股標準手續費為 strong0.1425%strong，ETF 證交稅為 strong0.1%strong，一般股票證交稅為 strong0.3%strong。若該標的不收費用，輸入時填 strong0strong 即可忽略。
-                p
-                div
-                    label class=block text-xs font-bold text-[#45322E] mb-1.5預設電子下單折數 (如 6 折填 6，無折扣填 10，免手續費填 0)label
-                    div class=flex items-center gap-2
-                        input type=number id=fee-discount-input min=0 max=10 step=0.1 inputmode=decimal
-                            class=illust-input w-full px-3.5 py-2 text-base font-black text-center
-                        span class=text-sm font-black text-[#45322E] shrink-0折span
-                    div
-                    div class=flex gap-1.5 mt-2
-                        button type=button onclick=setQuickDiscount(0) class=flex-1 text-xs font-bold bg-amber-100 hoverbg-amber-200 border border-[#45322E] py-1.5 rounded-xl cursor-pointer免手續費(0)button
-                        button type=button onclick=setQuickDiscount(2.8) class=flex-1 text-xs font-bold bg-amber-100 hoverbg-amber-200 border border-[#45322E] py-1.5 rounded-xl cursor-pointer2.8折button
-                        button type=button onclick=setQuickDiscount(6) class=flex-1 text-xs font-bold bg-amber-100 hoverbg-amber-200 border border-[#45322E] py-1.5 rounded-xl cursor-pointer6折button
-                    div
-                div
-                button type=button onclick=saveFeeSettings()
-                    class=w-full illust-btn bg-[#FACC15] hoverbg-[#FDE047] text-[#45322E] font-black text-sm py-2.5 rounded-xl cursor-pointer
+    <!-- 手續費折數設定 Modal -->
+    <div id="fee-settings-modal" class="fixed inset-0 z-50 hidden bg-[#45322E]/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-[#FFFDF7] border-[3px] border-[#45322E] rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
+            <div class="bg-[#FDE047] px-5 py-3.5 border-b-2 border-[#45322E] flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">⚙️</span>
+                    <h3 class="text-base font-black text-[#45322E]">券商手續費折數設定</h3>
+                </div>
+                <button onclick="closeFeeSettingsModal()" class="w-7 h-7 rounded-full bg-white border-2 border-[#45322E] flex items-center justify-center text-[#45322E] cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <p class="text-xs text-[#78625C] leading-relaxed">
+                    台股標準手續費為 <strong>0.1425%</strong>，ETF 證交稅為 <strong>0.1%</strong>，一般股票證交稅為 <strong>0.3%</strong>。若該標的不收費用，輸入時填 <strong>0</strong> 即可忽略。
+                </p>
+                <div>
+                    <label class="block text-xs font-bold text-[#45322E] mb-1.5">預設電子下單折數 (如 6 折填 6，無折扣填 10，免手續費填 0)</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="fee-discount-input" min="0" max="10" step="0.1" inputmode="decimal"
+                            class="illust-input w-full px-3.5 py-2 text-base font-black text-center">
+                        <span class="text-sm font-black text-[#45322E] shrink-0">折</span>
+                    </div>
+                    <div class="flex gap-1.5 mt-2">
+                        <button type="button" onclick="setQuickDiscount(0)" class="flex-1 text-xs font-bold bg-amber-100 hover:bg-amber-200 border border-[#45322E] py-1.5 rounded-xl cursor-pointer">免手續費(0)</button>
+                        <button type="button" onclick="setQuickDiscount(2.8)" class="flex-1 text-xs font-bold bg-amber-100 hover:bg-amber-200 border border-[#45322E] py-1.5 rounded-xl cursor-pointer">2.8折</button>
+                        <button type="button" onclick="setQuickDiscount(6)" class="flex-1 text-xs font-bold bg-amber-100 hover:bg-amber-200 border border-[#45322E] py-1.5 rounded-xl cursor-pointer">6折</button>
+                    </div>
+                </div>
+                <button type="button" onclick="saveFeeSettings()"
+                    class="w-full illust-btn bg-[#FACC15] hover:bg-[#FDE047] text-[#45322E] font-black text-sm py-2.5 rounded-xl cursor-pointer">
                     儲存設定
-                button
-            div
-        div
-    div
+                </button>
+            </div>
+        </div>
+    </div>
 
-    !-- JavaScript 邏輯 --
-    script
-         ==========================================
-         1. 本地儲存鍵值與初始資料
-         ==========================================
+    <!-- JavaScript 邏輯 -->
+    <script>
+        // ==========================================
+        // 1. 本地儲存鍵值與初始資料
+        // ==========================================
         const STORAGE_KEY_TX = 'yellow_stock_tracker_tx_v1';
         const STORAGE_KEY_PRICES = 'yellow_stock_tracker_prices_v1';
         const STORAGE_KEY_FEE_DISCOUNT = 'yellow_stock_tracker_fee_discount_v1';
 
         const defaultTransactions = [
             {
-                id 'tx-1',
-                name '2330 台積電',
-                buyDate '2026-10-15',
-                buyShares 1000,
-                buyPrice 980,
-                buyFee 838,
-                sellDate '',
-                sellShares 0,
-                sellPrice 0,
-                sellFee 0,
-                sellTax 0
+                id: 'tx-1',
+                name: '2330 台積電',
+                buyDate: '2026-10-15',
+                buyShares: 1000,
+                buyPrice: 980,
+                buyFee: 838,
+                sellDate: '',
+                sellShares: 0,
+                sellPrice: 0,
+                sellFee: 0,
+                sellTax: 0
             },
             {
-                id 'tx-2',
-                name '2330 台積電',
-                buyDate '2026-11-02',
-                buyShares 500,
-                buyPrice 1020,
-                buyFee 436,
-                sellDate '2026-11-12',
-                sellShares 500,
-                sellPrice 1065,
-                sellFee 455,
-                sellTax 1598
+                id: 'tx-2',
+                name: '2330 台積電',
+                buyDate: '2026-11-02',
+                buyShares: 500,
+                buyPrice: 1020,
+                buyFee: 436,
+                sellDate: '2026-11-12',
+                sellShares: 500,
+                sellPrice: 1065,
+                sellFee: 455,
+                sellTax: 1598
             },
             {
-                id 'tx-3',
-                name '0050 元大台灣50',
-                buyDate '2026-09-20',
-                buyShares 2000,
-                buyPrice 185.5,
-                buyFee 317,
-                sellDate '',
-                sellShares 0,
-                sellPrice 0,
-                sellFee 0,
-                sellTax 0
+                id: 'tx-3',
+                name: '0050 元大台灣50',
+                buyDate: '2026-09-20',
+                buyShares: 2000,
+                buyPrice: 185.5,
+                buyFee: 317,
+                sellDate: '',
+                sellShares: 0,
+                sellPrice: 0,
+                sellFee: 0,
+                sellTax: 0
             }
         ];
 
         const defaultPrices = {
-            '2330 台積電' 1055,
-            '0050 元大台灣50' 182.0
+            '2330 台積電': 1055,
+            '0050 元大台灣50': 182.0
         };
 
-         常見台股與 ETF 代號快速對應字典 (輸入代號即時帶出股票名稱)
+        // 常見台股與 ETF 代號快速對應字典 (輸入代號即時帶出股票名稱)
         const STOCK_CODE_DICTIONARY = {
-            '0050' '元大台灣50',
-            '0056' '元大高股息',
-            '00878' '國泰永續高股息',
-            '00919' '群益台灣精選高息',
-            '00929' '復華台灣科技優息',
-            '006208' '富邦台50',
-            '00713' '元大台灣高息低波',
-            '00940' '元大台灣價值高息',
-            '00679B' '元大美債20年',
-            '00687B' '國泰20年美債',
-            '2330' '台積電',
-            '2317' '鴻海',
-            '2454' '聯發科',
-            '2308' '台達電',
-            '2382' '廣達',
-            '2881' '富邦金',
-            '2882' '國泰金',
-            '2891' '中信金',
-            '2886' '兆豐金',
-            '2884' '玉山金',
-            '2412' '中華電',
-            '2603' '長榮',
-            '2609' '陽明',
-            '2615' '萬海',
-            '3008' '大立光',
-            '3231' '緯創',
-            '2357' '華碩',
-            '2303' '聯電',
-            '2002' '中鋼',
-            '1216' '統一'
+            '0050': '元大台灣50',
+            '0056': '元大高股息',
+            '00878': '國泰永續高股息',
+            '00919': '群益台灣精選高息',
+            '00929': '復華台灣科技優息',
+            '006208': '富邦台50',
+            '00713': '元大台灣高息低波',
+            '00940': '元大台灣價值高息',
+            '00679B': '元大美債20年',
+            '00687B': '國泰20年美債',
+            '2330': '台積電',
+            '2317': '鴻海',
+            '2454': '聯發科',
+            '2308': '台達電',
+            '2382': '廣達',
+            '2881': '富邦金',
+            '2882': '國泰金',
+            '2891': '中信金',
+            '2886': '兆豐金',
+            '2884': '玉山金',
+            '2412': '中華電',
+            '2603': '長榮',
+            '2609': '陽明',
+            '2615': '萬海',
+            '3008': '大立光',
+            '3231': '緯創',
+            '2357': '華碩',
+            '2303': '聯電',
+            '2002': '中鋼',
+            '1216': '統一'
         };
 
         let transactions = [];
         let currentPrices = {};
         let isTotalManuallyEdited = false;
-        let feeDiscount = 6;  預設券商手續費 6 折 (0~10，0 代表免手續費)
+        let feeDiscount = 6; // 預設券商手續費 6 折 (0~10，0 代表免手續費)
         let isBuyFeeManuallyEdited = false;
         let isSellFeeManuallyEdited = false;
         let codeLookupTimer = null;
 
-         載入 localStorage 資料
+        // 載入 localStorage 資料
         function loadData() {
             try {
                 const savedTx = localStorage.getItem(STORAGE_KEY_TX);
                 const savedPrices = localStorage.getItem(STORAGE_KEY_PRICES);
                 const savedDiscount = localStorage.getItem(STORAGE_KEY_FEE_DISCOUNT);
 
-                transactions = savedTx  JSON.parse(savedTx)  defaultTransactions;
-                currentPrices = savedPrices  JSON.parse(savedPrices)  defaultPrices;
+                transactions = savedTx ? JSON.parse(savedTx) : defaultTransactions;
+                currentPrices = savedPrices ? JSON.parse(savedPrices) : defaultPrices;
                 if (savedDiscount !== null && savedDiscount !== '') {
                     feeDiscount = parseFloat(savedDiscount);
                 }
@@ -564,7 +564,7 @@ body class=antialiased selectionbg-amber-200
             }
         }
 
-         儲存至 localStorage
+        // 儲存至 localStorage
         function saveData() {
             try {
                 localStorage.setItem(STORAGE_KEY_TX, JSON.stringify(transactions));
@@ -575,33 +575,33 @@ body class=antialiased selectionbg-amber-200
             }
         }
 
-         依據代號與金額計算手續費與證交稅管理費
+        // 依據代號與金額計算手續費與證交稅/管理費
         function estimateBrokerFee(amount) {
-            if (!amount  amount = 0  feeDiscount = 0) return 0;
-            const rawFee = amount  0.001425  (feeDiscount  10);
+            if (!amount || amount <= 0 || feeDiscount <= 0) return 0;
+            const rawFee = amount * 0.001425 * (feeDiscount / 10);
             return Math.max(1, Math.round(rawFee));
         }
 
         function getTaxRateByStockName(stockName) {
-            const codeMatch = (stockName  '').trim().match(^([A-Za-z0-9]+));
-            const code = codeMatch  codeMatch[1].toUpperCase()  '';
-             台灣債券 ETF (代號結尾為 B) 免證交稅；一般 ETF (00 開頭) 證交稅 0.1%；一般股票 0.3%
-            if (^00d+B$.test(code)) return 0;
+            const codeMatch = (stockName || '').trim().match(/^([A-Za-z0-9]+)/);
+            const code = codeMatch ? codeMatch[1].toUpperCase() : '';
+            // 台灣債券 ETF (代號結尾為 B) 免證交稅；一般 ETF (00 開頭) 證交稅 0.1%；一般股票 0.3%
+            if (/^00\d+B$/.test(code)) return 0;
             if (code.startsWith('00')) return 0.001;
             return 0.003;
         }
 
         function estimateSellTax(stockName, amount) {
-            if (!amount  amount = 0) return 0;
+            if (!amount || amount <= 0) return 0;
             const rate = getTaxRateByStockName(stockName);
-            if (rate = 0) return 0;
-            return Math.floor(amount  rate);
+            if (rate <= 0) return 0;
+            return Math.floor(amount * rate);
         }
 
         function updateHeaderDiscountLabel() {
             const label = document.getElementById('header-discount-label');
             if (!label) return;
-            label.textContent = feeDiscount === 0  '免手續費'  `手續費${feeDiscount}折`;
+            label.textContent = feeDiscount === 0 ? '免手續費' : `手續費${feeDiscount}折`;
         }
 
         function openFeeSettingsModal() {
@@ -619,7 +619,7 @@ body class=antialiased selectionbg-amber-200
 
         function saveFeeSettings() {
             const val = parseFloat(document.getElementById('fee-discount-input').value);
-            if (isNaN(val)  val  0  val  10) {
+            if (isNaN(val) || val < 0 || val > 10) {
                 showToast('請輸入 0 到 10 之間的折數', 'error');
                 return;
             }
@@ -629,45 +629,45 @@ body class=antialiased selectionbg-amber-200
             closeFeeSettingsModal();
             isBuyFeeManuallyEdited = false;
             updateBuyPreview();
-            showToast(feeDiscount === 0  '已設為免手續費！'  `已更新為手續費 ${feeDiscount} 折！`);
+            showToast(feeDiscount === 0 ? '已設為免手續費！' : `已更新為手續費 ${feeDiscount} 折！`);
         }
 
-         ==========================================
-         2. 初始化與工具函式
-         ==========================================
-        document.addEventListener('DOMContentLoaded', () = {
+        // ==========================================
+        // 2. 初始化與工具函式
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
             loadData();
 
-             預設今天日期
+            // 預設今天日期
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('buy-date').value = today;
 
-             股票代號與股票名稱雙向自動連動監聽
+            // 股票代號與股票名稱雙向自動連動監聽
             document.getElementById('buy-code').addEventListener('input', handleStockCodeInput);
             document.getElementById('buy-name').addEventListener('input', handleStockNameInput);
 
-             購買輸入即時計算
+            // 購買輸入即時計算
             document.getElementById('buy-shares').addEventListener('input', updateBuyPreview);
             document.getElementById('buy-price').addEventListener('input', updateBuyPreview);
-            document.getElementById('buy-fee').addEventListener('input', () = {
+            document.getElementById('buy-fee').addEventListener('input', () => {
                 isBuyFeeManuallyEdited = true;
             });
             document.getElementById('buy-form').addEventListener('submit', handleAddBuy);
 
-             賣出 Modal 即時試算
-            document.getElementById('sell-shares').addEventListener('input', () = {
+            // 賣出 Modal 即時試算
+            document.getElementById('sell-shares').addEventListener('input', () => {
                 isSellFeeManuallyEdited = false;
                 updateSellModalPreview();
             });
-            document.getElementById('sell-price').addEventListener('input', () = {
+            document.getElementById('sell-price').addEventListener('input', () => {
                 isSellFeeManuallyEdited = false;
                 updateSellModalPreview();
             });
-            document.getElementById('sell-fee').addEventListener('input', () = {
+            document.getElementById('sell-fee').addEventListener('input', () => {
                 isSellFeeManuallyEdited = true;
                 updateSellModalPreview();
             });
-            document.getElementById('sell-tax').addEventListener('input', () = {
+            document.getElementById('sell-tax').addEventListener('input', () => {
                 isSellFeeManuallyEdited = true;
                 updateSellModalPreview();
             });
@@ -678,25 +678,25 @@ body class=antialiased selectionbg-amber-200
         });
 
         function formatNumber(num) {
-            if (isNaN(num)  num === null) return '0';
-            return Number(num).toLocaleString('zh-TW', { maximumFractionDigits 2 });
+            if (isNaN(num) || num === null) return '0';
+            return Number(num).toLocaleString('zh-TW', { maximumFractionDigits: 2 });
         }
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const bgColor = type === 'error'  'bg-rose-500 text-white'  'bg-[#45322E] text-[#FEF9E7]';
-            toast.className = `${bgColor} border-2 border-[#45322E] px-4 py-2.5 rounded-2xl shadow-lg text-xs smtext-sm font-black flex items-center justify-center gap-2 transition-all duration-300 opacity-0 -translate-y-2`;
-            toast.innerHTML = `span${type === 'error'  '⚠️'  '✨'}spanspan${message}span`;
+            const bgColor = type === 'error' ? 'bg-rose-500 text-white' : 'bg-[#45322E] text-[#FEF9E7]';
+            toast.className = `${bgColor} border-2 border-[#45322E] px-4 py-2.5 rounded-2xl shadow-lg text-xs sm:text-sm font-black flex items-center justify-center gap-2 transition-all duration-300 opacity-0 -translate-y-2`;
+            toast.innerHTML = `<span>${type === 'error' ? '⚠️' : '✨'}</span><span>${message}</span>`;
             container.appendChild(toast);
 
-            requestAnimationFrame(() = {
+            requestAnimationFrame(() => {
                 toast.classList.remove('opacity-0', '-translate-y-2');
             });
 
-            setTimeout(() = {
+            setTimeout(() => {
                 toast.classList.add('opacity-0', '-translate-y-2');
-                setTimeout(() = toast.remove(), 300);
+                setTimeout(() => toast.remove(), 300);
             }, 2600);
         }
 
@@ -706,13 +706,13 @@ body class=antialiased selectionbg-amber-200
                 const headerOffset = 90;
                 const elementPosition = el.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                window.scrollTo({ top offsetPosition, behavior 'smooth' });
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
             }
         }
 
-         ==========================================
-         4. 股票代碼與名稱雙向自動連動邏輯
-         ==========================================
+        // ==========================================
+        // 4. 股票代碼與名稱雙向自動連動邏輯
+        // ==========================================
         async function handleStockCodeInput(e) {
             const code = e.target.value.trim().toUpperCase();
             const nameInput = document.getElementById('buy-name');
@@ -728,45 +728,45 @@ body class=antialiased selectionbg-amber-200
                 return;
             }
 
-             1. 優先比對內建常見台股ETF字典 (毫秒級即時帶出)
+            // 1. 優先比對內建常見台股/ETF字典 (毫秒級即時帶出)
             if (STOCK_CODE_DICTIONARY[code]) {
                 nameInput.value = STOCK_CODE_DICTIONARY[code];
                 statusEl.classList.add('hidden');
                 return;
             }
 
-             2. 若為 4~6 碼代號且不在字典中，透過 Gemini + Google Search 自動查詢名稱
-            if (^[0-9]{4,6}[A-Z]$.test(code)) {
+            // 2. 若為 4~6 碼代號且不在字典中，透過 Gemini + Google Search 自動查詢名稱
+            if (/^[0-9]{4,6}[A-Z]?$/.test(code)) {
                 statusEl.textContent = '查詢中...';
                 statusEl.classList.remove('hidden');
 
-                codeLookupTimer = setTimeout(async () = {
+                codeLookupTimer = setTimeout(async () => {
                     try {
-                        const apiKey = ;
-                        const url = `httpsgenerativelanguage.googleapis.comv1betamodelsgemini-2.5-flashgenerateContentkey=${apiKey}`;
+                        const apiKey = "";
+                        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
                         const prompt = `請查詢台灣股票或ETF代號「${code}」的中文簡稱（例如 0050 為 元大台灣50，2330 為 台積電）。請只回傳中文簡稱本身，不要包含代號、標點符號或其他解釋文字。若查無此代號請回傳 NONE。`;
 
                         const response = await fetch(url, {
-                            method 'POST',
-                            headers { 'Content-Type' 'applicationjson' },
-                            body JSON.stringify({
-                                contents [{ parts [{ text prompt }] }],
-                                tools [{ google_search {} }]
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: prompt }] }],
+                                tools: [{ google_search: {} }]
                             })
                         });
 
                         if (response.ok) {
                             const data = await response.json();
-                            const resultText = (data.candidates.[0].content.parts.[0].text  '').trim();
+                            const resultText = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
                             const currentCode = document.getElementById('buy-code').value.trim().toUpperCase();
-                            if (currentCode === code && resultText && resultText !== 'NONE' && resultText.length = 20) {
-                                const cleanName = resultText.replace(new RegExp(`^${code}s`), '').trim();
+                            if (currentCode === code && resultText && resultText !== 'NONE' && resultText.length <= 20) {
+                                const cleanName = resultText.replace(new RegExp(`^${code}\\s*`), '').trim();
                                 nameInput.value = cleanName;
-                                STOCK_CODE_DICTIONARY[code] = cleanName;  快取結果
+                                STOCK_CODE_DICTIONARY[code] = cleanName; // 快取結果
                             }
                         }
                     } catch (err) {
-                        console.warn('查詢股票名稱失敗', err);
+                        console.warn('查詢股票名稱失敗:', err);
                     } finally {
                         statusEl.classList.add('hidden');
                     }
@@ -776,21 +776,21 @@ body class=antialiased selectionbg-amber-200
             }
         }
 
-         輸入股票名稱時，反向自動帶出對應代碼
+        // 輸入股票名稱時，反向自動帶出對應代碼
         function handleStockNameInput(e) {
             const val = e.target.value.trim();
             const codeInput = document.getElementById('buy-code');
             if (!val) return;
 
-             若使用者直接輸入如 0050 元大台灣50，自動拆開填入
-            const combinedMatch = val.match(^([0-9]{4,6}[A-Za-z])s+(.+)$);
+            // 若使用者直接輸入如 "0050 元大台灣50"，自動拆開填入
+            const combinedMatch = val.match(/^([0-9]{4,6}[A-Za-z]?)\s+(.+)$/);
             if (combinedMatch) {
                 codeInput.value = combinedMatch[1].toUpperCase();
                 e.target.value = combinedMatch[2].trim();
                 return;
             }
 
-             比對字典名稱反向帶入代碼
+            // 比對字典名稱反向帶入代碼
             for (const [dictCode, dictName] of Object.entries(STOCK_CODE_DICTIONARY)) {
                 if (dictName === val) {
                     codeInput.value = dictCode;
@@ -799,18 +799,18 @@ body class=antialiased selectionbg-amber-200
             }
         }
 
-         ==========================================
-         5. 新增單筆購買
-         ==========================================
+        // ==========================================
+        // 5. 新增單筆購買
+        // ==========================================
         function updateBuyPreview() {
-            const shares = parseFloat(document.getElementById('buy-shares').value)  0;
-            const price = parseFloat(document.getElementById('buy-price').value)  0;
-            const total = shares  price;
+            const shares = parseFloat(document.getElementById('buy-shares').value) || 0;
+            const price = parseFloat(document.getElementById('buy-price').value) || 0;
+            const total = shares * price;
             document.getElementById('preview-buy-total').textContent = formatNumber(total);
 
             if (!isBuyFeeManuallyEdited) {
                 const feeInput = document.getElementById('buy-fee');
-                feeInput.value = total  0  estimateBrokerFee(total)  '';
+                feeInput.value = total > 0 ? estimateBrokerFee(total) : '';
             }
         }
 
@@ -822,28 +822,28 @@ body class=antialiased selectionbg-amber-200
             const buyShares = parseFloat(document.getElementById('buy-shares').value);
             const buyPrice = parseFloat(document.getElementById('buy-price').value);
             const buyFeeRaw = parseFloat(document.getElementById('buy-fee').value);
-            const buyFee = !isNaN(buyFeeRaw) && buyFeeRaw = 0  buyFeeRaw  0;
+            const buyFee = !isNaN(buyFeeRaw) && buyFeeRaw >= 0 ? buyFeeRaw : 0;
 
-            if (!code  !stockTitle  !buyDate  isNaN(buyShares)  isNaN(buyPrice)  buyShares = 0  buyPrice = 0) {
+            if (!code || !stockTitle || !buyDate || isNaN(buyShares) || isNaN(buyPrice) || buyShares <= 0 || buyPrice <= 0) {
                 showToast('請填寫完整的股票代號、股票名稱、股數與金額喔！', 'error');
                 return;
             }
 
-             組合「代號 股票名稱」方便後續合併持股與搜尋股價
-            const name = stockTitle.startsWith(code)  stockTitle  `${code} ${stockTitle}`;
+            // 組合「代號 股票名稱」方便後續合併持股與搜尋股價
+            const name = stockTitle.startsWith(code) ? stockTitle : `${code} ${stockTitle}`;
 
             const newTx = {
-                id 'tx-' + Date.now(),
+                id: 'tx-' + Date.now(),
                 name,
                 buyDate,
                 buyShares,
                 buyPrice,
                 buyFee,
-                sellDate '',
-                sellShares 0,
-                sellPrice 0,
-                sellFee 0,
-                sellTax 0
+                sellDate: '',
+                sellShares: 0,
+                sellPrice: 0,
+                sellFee: 0,
+                sellTax: 0
             };
 
             transactions.unshift(newTx);
@@ -852,7 +852,7 @@ body class=antialiased selectionbg-amber-200
                 currentPrices[name] = buyPrice;
             }
 
-             清空表單
+            // 清空表單
             document.getElementById('buy-code').value = '';
             document.getElementById('buy-name').value = '';
             document.getElementById('buy-shares').value = '';
@@ -867,17 +867,17 @@ body class=antialiased selectionbg-amber-200
         }
 
         function deleteTransaction(id) {
-            transactions = transactions.filter(tx = tx.id !== id);
+            transactions = transactions.filter(tx => tx.id !== id);
             saveData();
             renderAll();
             showToast('已刪除該筆紀錄');
         }
 
-         ==========================================
-         6. 賣出 Modal 與盈餘計算邏輯 (含手續費及管理費證交稅)
-         ==========================================
+        // ==========================================
+        // 6. 賣出 Modal 與盈餘計算邏輯 (含手續費及管理費/證交稅)
+        // ==========================================
         function openSellModal(id) {
-            const tx = transactions.find(t = t.id === id);
+            const tx = transactions.find(t => t.id === id);
             if (!tx) return;
 
             document.getElementById('sell-tx-id').value = tx.id;
@@ -885,27 +885,27 @@ body class=antialiased selectionbg-amber-200
             document.getElementById('modal-buy-date').textContent = tx.buyDate;
             document.getElementById('modal-buy-shares').textContent = formatNumber(tx.buyShares);
             document.getElementById('modal-buy-price').textContent = formatNumber(tx.buyPrice);
-            document.getElementById('modal-buy-total').textContent = formatNumber(tx.buyShares  tx.buyPrice);
+            document.getElementById('modal-buy-total').textContent = formatNumber(tx.buyShares * tx.buyPrice);
 
             const rate = getTaxRateByStockName(tx.name);
             const rateBadge = document.getElementById('modal-tax-rate-badge');
-            rateBadge.textContent = rate === 0  '免稅(0%)'  `${(rate  100).toFixed(1)}%`;
+            rateBadge.textContent = rate === 0 ? '免稅(0%)' : `${(rate * 100).toFixed(1)}%`;
 
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('sell-date').value = tx.sellDate  today;
-            document.getElementById('sell-shares').value = tx.sellShares  0  tx.sellShares  tx.buyShares;
-            document.getElementById('sell-price').value = tx.sellPrice  0  tx.sellPrice  (currentPrices[tx.name]  '');
+            document.getElementById('sell-date').value = tx.sellDate || today;
+            document.getElementById('sell-shares').value = tx.sellShares > 0 ? tx.sellShares : tx.buyShares;
+            document.getElementById('sell-price').value = tx.sellPrice > 0 ? tx.sellPrice : (currentPrices[tx.name] || '');
 
-            if (tx.sellShares  0) {
-                document.getElementById('sell-fee').value = tx.sellFee !== undefined  tx.sellFee  0;
-                document.getElementById('sell-tax').value = tx.sellTax !== undefined  tx.sellTax  0;
+            if (tx.sellShares > 0) {
+                document.getElementById('sell-fee').value = tx.sellFee !== undefined ? tx.sellFee : 0;
+                document.getElementById('sell-tax').value = tx.sellTax !== undefined ? tx.sellTax : 0;
                 isSellFeeManuallyEdited = true;
             } else {
                 isSellFeeManuallyEdited = false;
             }
 
             const clearBtn = document.getElementById('clear-sell-btn');
-            if (tx.sellShares  0) {
+            if (tx.sellShares > 0) {
                 clearBtn.classList.remove('hidden');
             } else {
                 clearBtn.classList.add('hidden');
@@ -921,7 +921,7 @@ body class=antialiased selectionbg-amber-200
 
         function fillAllShares() {
             const id = document.getElementById('sell-tx-id').value;
-            const tx = transactions.find(t = t.id === id);
+            const tx = transactions.find(t => t.id === id);
             if (tx) {
                 document.getElementById('sell-shares').value = tx.buyShares;
                 isSellFeeManuallyEdited = false;
@@ -929,24 +929,24 @@ body class=antialiased selectionbg-amber-200
             }
         }
 
-         計算單筆交易對應賣出股數的分攤買進手續費
+        // 計算單筆交易對應賣出股數的分攤買進手續費
         function getProportionalBuyFee(tx, sellShares) {
-            const totalBuyFee = tx.buyFee  0;
-            if (totalBuyFee = 0  !tx.buyShares  tx.buyShares = 0) return 0;
-            const ratio = Math.min(1, sellShares  tx.buyShares);
-            return Math.round(totalBuyFee  ratio);
+            const totalBuyFee = tx.buyFee || 0;
+            if (totalBuyFee <= 0 || !tx.buyShares || tx.buyShares <= 0) return 0;
+            const ratio = Math.min(1, sellShares / tx.buyShares);
+            return Math.round(totalBuyFee * ratio);
         }
 
-         計算單筆交易的賣出淨盈餘 (總賣出金額 - 對應買入成本 - 買進手續費 - 賣出手續費 - 證交稅管理費)
+        // 計算單筆交易的賣出淨盈餘 (總賣出金額 - 對應買入成本 - 買進手續費 - 賣出手續費 - 證交稅/管理費)
         function calculateTxProfitDetails(tx, sellShares, sellPrice, sellFee, sellTax) {
-            if (!sellShares  sellShares = 0  !sellPrice  sellPrice = 0) {
-                return { totalSell 0, correspondingCost 0, proportionalBuyFee 0, totalFees 0, netProfit 0 };
+            if (!sellShares || sellShares <= 0 || !sellPrice || sellPrice <= 0) {
+                return { totalSell: 0, correspondingCost: 0, proportionalBuyFee: 0, totalFees: 0, netProfit: 0 };
             }
-            const totalSell = sellShares  sellPrice;
-            const correspondingCost = sellShares  tx.buyPrice;
+            const totalSell = sellShares * sellPrice;
+            const correspondingCost = sellShares * tx.buyPrice;
             const proportionalBuyFee = getProportionalBuyFee(tx, sellShares);
-            const safeSellFee = sellFee  0;
-            const safeSellTax = sellTax  0;
+            const safeSellFee = sellFee || 0;
+            const safeSellTax = sellTax || 0;
             const totalFees = proportionalBuyFee + safeSellFee + safeSellTax;
             const netProfit = totalSell - correspondingCost - totalFees;
 
@@ -955,27 +955,27 @@ body class=antialiased selectionbg-amber-200
 
         function updateSellModalPreview() {
             const id = document.getElementById('sell-tx-id').value;
-            const tx = transactions.find(t = t.id === id);
+            const tx = transactions.find(t => t.id === id);
             if (!tx) return;
 
-            const sellShares = parseFloat(document.getElementById('sell-shares').value)  0;
-            const sellPrice = parseFloat(document.getElementById('sell-price').value)  0;
-            const totalSell = sellShares  sellPrice;
+            const sellShares = parseFloat(document.getElementById('sell-shares').value) || 0;
+            const sellPrice = parseFloat(document.getElementById('sell-price').value) || 0;
+            const totalSell = sellShares * sellPrice;
 
             if (!isSellFeeManuallyEdited) {
-                document.getElementById('sell-fee').value = totalSell  0  estimateBrokerFee(totalSell)  0;
-                document.getElementById('sell-tax').value = totalSell  0  estimateSellTax(tx.name, totalSell)  0;
+                document.getElementById('sell-fee').value = totalSell > 0 ? estimateBrokerFee(totalSell) : 0;
+                document.getElementById('sell-tax').value = totalSell > 0 ? estimateSellTax(tx.name, totalSell) : 0;
             }
 
-            const sellFee = parseFloat(document.getElementById('sell-fee').value)  0;
-            const sellTax = parseFloat(document.getElementById('sell-tax').value)  0;
+            const sellFee = parseFloat(document.getElementById('sell-fee').value) || 0;
+            const sellTax = parseFloat(document.getElementById('sell-tax').value) || 0;
             const details = calculateTxProfitDetails(tx, sellShares, sellPrice, sellFee, sellTax);
 
             document.getElementById('modal-preview-sell-total').textContent = formatNumber(details.totalSell);
             document.getElementById('modal-preview-total-fees').textContent = formatNumber(details.totalFees);
 
             const feesRow = document.getElementById('modal-fees-row');
-            if (details.totalFees  0) {
+            if (details.totalFees > 0) {
                 feesRow.classList.remove('hidden');
             } else {
                 feesRow.classList.add('hidden');
@@ -984,16 +984,16 @@ body class=antialiased selectionbg-amber-200
             const profitEl = document.getElementById('modal-preview-profit');
             const noteEl = document.getElementById('modal-profit-formula-note');
 
-            if (details.totalFees  0) {
+            if (details.totalFees > 0) {
                 noteEl.textContent = `賣出 $${formatNumber(details.totalSell)} - 成本 $${formatNumber(details.correspondingCost)} - 費用 $${formatNumber(details.totalFees)}`;
             } else {
-                noteEl.textContent = `賣出 $${formatNumber(details.totalSell)} - 成本 $${formatNumber(details.correspondingCost)} (無手續管理費)`;
+                noteEl.textContent = `賣出 $${formatNumber(details.totalSell)} - 成本 $${formatNumber(details.correspondingCost)} (無手續/管理費)`;
             }
 
-            if (details.netProfit  0) {
+            if (details.netProfit > 0) {
                 profitEl.textContent = `+$${formatNumber(details.netProfit)} (賺)`;
                 profitEl.className = 'font-black text-lg profit-up';
-            } else if (details.netProfit  0) {
+            } else if (details.netProfit < 0) {
                 profitEl.textContent = `-$${formatNumber(Math.abs(details.netProfit))} (虧)`;
                 profitEl.className = 'font-black text-lg profit-down';
             } else {
@@ -1005,7 +1005,7 @@ body class=antialiased selectionbg-amber-200
         function handleSaveSell(e) {
             e.preventDefault();
             const id = document.getElementById('sell-tx-id').value;
-            const tx = transactions.find(t = t.id === id);
+            const tx = transactions.find(t => t.id === id);
             if (!tx) return;
 
             const sellDate = document.getElementById('sell-date').value;
@@ -1014,12 +1014,12 @@ body class=antialiased selectionbg-amber-200
             const sellFeeRaw = parseFloat(document.getElementById('sell-fee').value);
             const sellTaxRaw = parseFloat(document.getElementById('sell-tax').value);
 
-            if (!sellDate  isNaN(sellShares)  sellShares = 0  isNaN(sellPrice)  sellPrice = 0) {
+            if (!sellDate || isNaN(sellShares) || sellShares <= 0 || isNaN(sellPrice) || sellPrice <= 0) {
                 showToast('請輸入正確的賣出股數與金額', 'error');
                 return;
             }
 
-            if (sellShares  tx.buyShares) {
+            if (sellShares > tx.buyShares) {
                 showToast(`賣出股數不能超過購買股數 (${tx.buyShares} 股) 喔！`, 'error');
                 return;
             }
@@ -1027,8 +1027,8 @@ body class=antialiased selectionbg-amber-200
             tx.sellDate = sellDate;
             tx.sellShares = sellShares;
             tx.sellPrice = sellPrice;
-            tx.sellFee = !isNaN(sellFeeRaw) && sellFeeRaw = 0  sellFeeRaw  0;
-            tx.sellTax = !isNaN(sellTaxRaw) && sellTaxRaw = 0  sellTaxRaw  0;
+            tx.sellFee = !isNaN(sellFeeRaw) && sellFeeRaw >= 0 ? sellFeeRaw : 0;
+            tx.sellTax = !isNaN(sellTaxRaw) && sellTaxRaw >= 0 ? sellTaxRaw : 0;
 
             closeSellModal();
             saveData();
@@ -1038,7 +1038,7 @@ body class=antialiased selectionbg-amber-200
 
         function clearSellRecord() {
             const id = document.getElementById('sell-tx-id').value;
-            const tx = transactions.find(t = t.id === id);
+            const tx = transactions.find(t => t.id === id);
             if (!tx) return;
 
             tx.sellDate = '';
@@ -1053,28 +1053,28 @@ body class=antialiased selectionbg-amber-200
             showToast('已清除該筆賣出紀錄');
         }
 
-         ==========================================
-         7. 持股彙整、平均股價、現在股價與一鍵自動搜尋更新
-         ==========================================
+        // ==========================================
+        // 7. 持股彙整、平均股價、現在股價與一鍵自動搜尋更新
+        // ==========================================
         function getActiveStockNames() {
             const names = new Set();
-            transactions.forEach(tx = {
-                const remaining = tx.buyShares - (tx.sellShares  0);
-                if (remaining  0) names.add(tx.name);
+            transactions.forEach(tx => {
+                const remaining = tx.buyShares - (tx.sellShares || 0);
+                if (remaining > 0) names.add(tx.name);
             });
             return Array.from(names);
         }
 
         function updateCurrentPrice(stockName, value) {
             const price = parseFloat(value);
-            if (!isNaN(price) && price = 0) {
+            if (!isNaN(price) && price >= 0) {
                 currentPrices[stockName] = price;
                 saveData();
                 renderHoldings();
             }
         }
 
-         一鍵重新整理，透過 Gemini API + Google Search 自動搜尋最新股價
+        // 一鍵重新整理，透過 Gemini API + Google Search 自動搜尋最新股價
         async function autoFetchCurrentPrices() {
             const stockNames = getActiveStockNames();
             if (stockNames.length === 0) {
@@ -1092,21 +1092,21 @@ body class=antialiased selectionbg-amber-200
             text.textContent = '搜尋股價中...';
 
             try {
-                const apiKey = ;
-                const url = `httpsgenerativelanguage.googleapis.comv1betamodelsgemini-2.5-flashgenerateContentkey=${apiKey}`;
+                const apiKey = "";
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
                 const prompt = `請查詢以下台灣股票或ETF的最新即時股價（或最近一個交易日的收盤價，純數字台幣元）：
-${stockNames.map((n, i) = `${i + 1}. ${n}`).join('n')}
+${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
 
 請嚴格回傳 JSON 格式陣列，不要包含任何 Markdown 標記或多餘文字，格式如下：
-[{name 股票名稱(需與上述完全一致), price 股價數字}]`;
+[{"name": "股票名稱(需與上述完全一致)", "price": 股價數字}]`;
 
                 const response = await fetch(url, {
-                    method 'POST',
-                    headers { 'Content-Type' 'applicationjson' },
-                    body JSON.stringify({
-                        contents [{ parts [{ text prompt }] }],
-                        tools [{ google_search {} }]
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        tools: [{ google_search: {} }]
                     })
                 });
 
@@ -1115,8 +1115,8 @@ ${stockNames.map((n, i) = `${i + 1}. ${n}`).join('n')}
                 }
 
                 const data = await response.json();
-                const rawText = data.candidates.[0].content.parts.[0].text  '';
-                const jsonMatch = rawText.match([[sS]]);
+                const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const jsonMatch = rawText.match(/\[[\s\S]*\]/);
 
                 if (!jsonMatch) {
                     throw new Error('無法解析股價回傳格式');
@@ -1125,10 +1125,10 @@ ${stockNames.map((n, i) = `${i + 1}. ${n}`).join('n')}
                 const parsedList = JSON.parse(jsonMatch[0]);
                 let updatedCount = 0;
 
-                parsedList.forEach(item = {
-                    if (item && item.name && typeof item.price === 'number' && item.price  0) {
+                parsedList.forEach(item => {
+                    if (item && item.name && typeof item.price === 'number' && item.price > 0) {
                         const matchedName = stockNames.find(
-                            s = s === item.name  s.includes(item.name)  item.name.includes(s)
+                            s => s === item.name || s.includes(item.name) || item.name.includes(s)
                         );
                         if (matchedName) {
                             currentPrices[matchedName] = item.price;
@@ -1137,17 +1137,17 @@ ${stockNames.map((n, i) = `${i + 1}. ${n}`).join('n')}
                     }
                 });
 
-                if (updatedCount  0) {
+                if (updatedCount > 0) {
                     saveData();
                     renderHoldings();
-                    const nowStr = new Date().toLocaleTimeString('zh-TW', { hour '2-digit', minute '2-digit' });
+                    const nowStr = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
                     document.getElementById('last-price-update-time').textContent = `已於 ${nowStr} 自動更新最新報價`;
                     showToast(`已成功更新 ${updatedCount} 檔股票最新股價！`);
                 } else {
                     showToast('查無對應最新股價，請稍後再試或手動輸入', 'error');
                 }
             } catch (error) {
-                console.error('自動搜尋股價失敗', error);
+                console.error('自動搜尋股價失敗:', error);
                 showToast('自動搜尋股價暫時無法連線，您可手動修改現價！', 'error');
             } finally {
                 btn.disabled = false;
@@ -1167,19 +1167,19 @@ ${stockNames.map((n, i) = `${i + 1}. ${n}`).join('n')}
             const container = document.getElementById('holdings-list');
             const holdingsMap = {};
 
-             彙整尚未賣出的持股與平均股價
-            transactions.forEach(tx = {
-                const remainingShares = tx.buyShares - (tx.sellShares  0);
-                if (remainingShares  0) {
+            // 彙整尚未賣出的持股與平均股價
+            transactions.forEach(tx => {
+                const remainingShares = tx.buyShares - (tx.sellShares || 0);
+                if (remainingShares > 0) {
                     if (!holdingsMap[tx.name]) {
                         holdingsMap[tx.name] = {
-                            name tx.name,
-                            shares 0,
-                            totalCost 0
+                            name: tx.name,
+                            shares: 0,
+                            totalCost: 0
                         };
                     }
                     holdingsMap[tx.name].shares += remainingShares;
-                    holdingsMap[tx.name].totalCost += remainingShares  tx.buyPrice;
+                    holdingsMap[tx.name].totalCost += remainingShares * tx.buyPrice;
                 }
             });
 
@@ -1187,33 +1187,33 @@ ${stockNames.map((n, i) = `${i + 1}. ${n}`).join('n')}
 
             if (stocks.length === 0) {
                 container.innerHTML = `
-                    div class=illust-card p-6 text-center space-y-2 bg-[#FFFDF9]
-                        div class=text-3xl🐣div
-                        p class=text-sm font-black text-[#45322E]目前沒有持有中的股票喔！p
-                        p class=text-xs text-[#78625C]在上方新增購買紀錄後，這裡會自動計算平均成本與賺虧。p
-                    div
+                    <div class="illust-card p-6 text-center space-y-2 bg-[#FFFDF9]">
+                        <div class="text-3xl">🐣</div>
+                        <p class="text-sm font-black text-[#45322E]">目前沒有持有中的股票喔！</p>
+                        <p class="text-xs text-[#78625C]">在上方新增購買紀錄後，這裡會自動計算平均成本與賺虧。</p>
+                    </div>
                 `;
                 return;
             }
 
-            container.innerHTML = stocks.map(stock = {
-                const avgPrice = stock.totalCost  stock.shares;
-                const curPrice = currentPrices[stock.name] !== undefined  currentPrices[stock.name]  avgPrice;
-                const marketValue = stock.shares  curPrice;
+            container.innerHTML = stocks.map(stock => {
+                const avgPrice = stock.totalCost / stock.shares;
+                const curPrice = currentPrices[stock.name] !== undefined ? currentPrices[stock.name] : avgPrice;
+                const marketValue = stock.shares * curPrice;
                 const unrealizedProfit = marketValue - stock.totalCost;
-                const profitPercent = stock.totalCost  0  (unrealizedProfit  stock.totalCost)  100  0;
+                const profitPercent = stock.totalCost > 0 ? (unrealizedProfit / stock.totalCost) * 100 : 0;
 
                 let badgeClass = 'bg-stone-100 text-[#45322E] border-[#45322E]';
                 let amountClass = 'text-[#45322E]';
                 let statusEmoji = '➖';
                 let statusText = '持平';
 
-                if (unrealizedProfit  0) {
+                if (unrealizedProfit > 0) {
                     badgeClass = 'bg-rose-100 text-rose-700 border-rose-600';
                     amountClass = 'profit-up';
                     statusEmoji = '📈';
                     statusText = `賺 +$${formatNumber(unrealizedProfit)} (+${profitPercent.toFixed(1)}%)`;
-                } else if (unrealizedProfit  0) {
+                } else if (unrealizedProfit < 0) {
                     badgeClass = 'bg-emerald-100 text-emerald-700 border-emerald-600';
                     amountClass = 'profit-down';
                     statusEmoji = '📉';
@@ -1221,45 +1221,45 @@ ${stockNames.map((n, i) = `${i + 1}. ${n}`).join('n')}
                 }
 
                 return `
-                    div class=illust-card p-4 space-y-3
-                        !-- 股票名稱與總持股數 --
-                        div class=flex items-center justify-between border-b-2 border-dashed border-[#E6D8C3] pb-2.5
-                            div
-                                h3 class=text-base font-black text-[#45322E]${stock.name}h3
-                                span class=text-xs font-bold text-[#78625C]持有股數：${formatNumber(stock.shares)} 股span
-                            div
-                            span class=text-xs font-black px-3 py-1 rounded-full border-2 ${badgeClass}
+                    <div class="illust-card p-4 space-y-3">
+                        <!-- 股票名稱與總持股數 -->
+                        <div class="flex items-center justify-between border-b-2 border-dashed border-[#E6D8C3] pb-2.5">
+                            <div>
+                                <h3 class="text-base font-black text-[#45322E]">${stock.name}</h3>
+                                <span class="text-xs font-bold text-[#78625C]">持有股數：${formatNumber(stock.shares)} 股</span>
+                            </div>
+                            <span class="text-xs font-black px-3 py-1 rounded-full border-2 ${badgeClass}">
                                 ${statusEmoji} ${statusText}
-                            span
-                        div
+                            </span>
+                        </div>
 
-                        !-- 平均股價 vs 現在股價輸入 --
-                        div class=grid grid-cols-2 gap-3
-                            div class=bg-[#FEF9E7] rounded-2xl p-3 border border-[#E6D8C3]
-                                span class=text-[11px] font-bold text-[#78625C] block mb-0.5目前平均股價span
-                                span class=text-lg font-black text-[#45322E]$${formatNumber(avgPrice)}span
-                            div
+                        <!-- 平均股價 vs 現在股價輸入 -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-[#FEF9E7] rounded-2xl p-3 border border-[#E6D8C3]">
+                                <span class="text-[11px] font-bold text-[#78625C] block mb-0.5">目前平均股價</span>
+                                <span class="text-lg font-black text-[#45322E]">$${formatNumber(avgPrice)}</span>
+                            </div>
 
-                            div class=bg-[#FEF3C7] rounded-2xl p-3 border-2 border-[#45322E]
-                                label class=text-[11px] font-black text-[#45322E] block mb-0.5現在股價 (可修改) ✎label
-                                div class=flex items-center
-                                    span class=text-sm font-black text-[#FB923C] mr-1$span
-                                    input type=number step=any min=0 inputmode=decimal
-                                        value=${curPrice}
-                                        onchange=updateCurrentPrice('${stock.name.replace('g, ')}', this.value)
-                                        class=w-full text-lg font-black text-[#45322E] bg-transparent focusoutline-none
-                                div
-                            div
-                        div
+                            <div class="bg-[#FEF3C7] rounded-2xl p-3 border-2 border-[#45322E]">
+                                <label class="text-[11px] font-black text-[#45322E] block mb-0.5">現在股價 (可修改) ✎</label>
+                                <div class="flex items-center">
+                                    <span class="text-sm font-black text-[#FB923C] mr-1">$</span>
+                                    <input type="number" step="any" min="0" inputmode="decimal"
+                                        value="${curPrice}"
+                                        onchange="updateCurrentPrice('${stock.name.replace(/'/g, "\\'")}', this.value)"
+                                        class="w-full text-lg font-black text-[#45322E] bg-transparent focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
 
-                        !-- 底部賺虧總結列 --
-                        div class=flex items-center justify-between text-xs pt-1
-                            span class=font-bold text-[#78625C]成本 $${formatNumber(stock.totalCost)} → 市值 $${formatNumber(marketValue)}span
-                            span class=font-black text-sm ${amountClass}
-                                ${unrealizedProfit = 0  '+'  '-'}$${formatNumber(Math.abs(unrealizedProfit))}
-                            span
-                        div
-                    div
+                        <!-- 底部賺虧總結列 -->
+                        <div class="flex items-center justify-between text-xs pt-1">
+                            <span class="font-bold text-[#78625C]">成本 $${formatNumber(stock.totalCost)} → 市值 $${formatNumber(marketValue)}</span>
+                            <span class="font-black text-sm ${amountClass}">
+                                ${unrealizedProfit >= 0 ? '+' : '-'}$${formatNumber(Math.abs(unrealizedProfit))}
+                            </span>
+                        </div>
+                    </div>
                 `;
             }).join('');
         }
@@ -1270,111 +1270,113 @@ ${stockNames.map((n, i) = `${i + 1}. ${n}`).join('n')}
 
             if (transactions.length === 0) {
                 container.innerHTML = `
-                    div class=illust-card p-6 text-center space-y-2
-                        div class=text-3xl📝div
-                        p class=text-sm font-black text-[#45322E]還沒有任何買賣紀錄p
-                        p class=text-xs text-[#78625C]點擊上方表單開始記下您的第一筆投資吧！p
-                    div
+                    <div class="illust-card p-6 text-center space-y-2">
+                        <div class="text-3xl">📝</div>
+                        <p class="text-sm font-black text-[#45322E]">還沒有任何買賣紀錄</p>
+                        <p class="text-xs text-[#78625C]">點擊上方表單開始記下您的第一筆投資吧！</p>
+                    </div>
                 `;
                 return;
             }
 
-            container.innerHTML = transactions.map(tx = {
-                const totalBuy = tx.buyShares  tx.buyPrice;
-                const buyFee = tx.buyFee  0;
-                const hasSold = tx.sellShares  0;
-                const sellFee = tx.sellFee  0;
-                const sellTax = tx.sellTax  0;
+            container.innerHTML = transactions.map(tx => {
+                const totalBuy = tx.buyShares * tx.buyPrice;
+                const buyFee = tx.buyFee || 0;
+                const hasSold = tx.sellShares > 0;
+                const sellFee = tx.sellFee || 0;
+                const sellTax = tx.sellTax || 0;
                 const details = hasSold
-                     calculateTxProfitDetails(tx, tx.sellShares, tx.sellPrice, sellFee, sellTax)
-                     { totalSell 0, totalFees 0, netProfit 0 };
+                    ? calculateTxProfitDetails(tx, tx.sellShares, tx.sellPrice, sellFee, sellTax)
+                    : { totalSell: 0, totalFees: 0, netProfit: 0 };
 
-                 狀態小貼紙
+                // 狀態小貼紙
                 let statusBadge = '';
                 if (!hasSold) {
-                    statusBadge = `span class=text-[11px] font-bold bg-[#FEF08A] text-[#45322E] px-2.5 py-0.5 rounded-full border border-[#45322E]🌱 持有中span`;
-                } else if (tx.sellShares  tx.buyShares) {
-                    statusBadge = `span class=text-[11px] font-bold bg-amber-200 text-[#45322E] px-2.5 py-0.5 rounded-full border border-[#45322E]✂️ 部分賣出 (剩 ${formatNumber(tx.buyShares - tx.sellShares)} 股)span`;
+                    statusBadge = `<span class="text-[11px] font-bold bg-[#FEF08A] text-[#45322E] px-2.5 py-0.5 rounded-full border border-[#45322E]">🌱 持有中</span>`;
+                } else if (tx.sellShares < tx.buyShares) {
+                    statusBadge = `<span class="text-[11px] font-bold bg-amber-200 text-[#45322E] px-2.5 py-0.5 rounded-full border border-[#45322E]">✂️ 部分賣出 (剩 ${formatNumber(tx.buyShares - tx.sellShares)} 股)</span>`;
                 } else {
-                    statusBadge = `span class=text-[11px] font-bold bg-stone-200 text-stone-700 px-2.5 py-0.5 rounded-full border border-[#45322E]✅ 已全數賣出span`;
+                    statusBadge = `<span class="text-[11px] font-bold bg-stone-200 text-stone-700 px-2.5 py-0.5 rounded-full border border-[#45322E]">✅ 已全數賣出</span>`;
                 }
 
-                 賣出結算區塊 (若有賣出則顯示在購買處下方，包含手續費稅費與淨盈餘)
+                // 賣出結算區塊 (若有賣出則顯示在購買處下方，包含手續費/稅費與淨盈餘)
                 let sellSectionHtml = '';
                 if (hasSold) {
                     let profitStyle = 'text-[#45322E]';
                     let profitLabel = '$0';
-                    if (details.netProfit  0) {
+                    if (details.netProfit > 0) {
                         profitStyle = 'profit-up';
                         profitLabel = `+$${formatNumber(details.netProfit)} (賺)`;
-                    } else if (details.netProfit  0) {
+                    } else if (details.netProfit < 0) {
                         profitStyle = 'profit-down';
                         profitLabel = `-$${formatNumber(Math.abs(details.netProfit))} (虧)`;
                     }
 
-                     只有當該股票有產生手續費或證交稅管理費時才顯示費用明細列，若沒有則忽略
-                    const feeBreakdownHtml = details.totalFees  0
-                         `div class=flex items-center justify-between text-[11px] text-[#78625C] bg-white80 px-2.5 py-1 rounded-lg border border-amber-200
-                               span扣除費用明細：span
-                               span買手續費 $${formatNumber(details.proportionalBuyFee)} + 賣手續費 $${formatNumber(sellFee)} + 稅管理費 $${formatNumber(sellTax)} = strong class=text-amber-900-$${formatNumber(details.totalFees)}strongspan
-                           div`
-                         '';
+                    // 只有當該股票有產生手續費或證交稅/管理費時才顯示費用明細列，若沒有則忽略
+                    const feeBreakdownHtml = details.totalFees > 0
+                        ? `<div class="flex items-center justify-between text-[11px] text-[#78625C] bg-white/80 px-2.5 py-1 rounded-lg border border-amber-200">
+                               <span>扣除費用明細：</span>
+                               <span>買手續費 $${formatNumber(details.proportionalBuyFee)} + 賣手續費 $${formatNumber(sellFee)} + 稅/管理費 $${formatNumber(sellTax)} = <strong class="text-amber-900">-$${formatNumber(details.totalFees)}</strong></span>
+                           </div>`
+                        : '';
 
                     sellSectionHtml = `
-                        div class=bg-[#FFFBEB] border-2 border-dashed border-amber-400 rounded-2xl p-3 space-y-2 text-xs
-                            div class=flex items-center justify-between font-bold text-amber-900
-                                span📤 賣出日期：${tx.sellDate}span
-                                span${formatNumber(tx.sellShares)} 股 × $${formatNumber(tx.sellPrice)}span
-                            div
+                        <div class="bg-[#FFFBEB] border-2 border-dashed border-amber-400 rounded-2xl p-3 space-y-2 text-xs">
+                            <div class="flex items-center justify-between font-bold text-amber-900">
+                                <span>📤 賣出日期：${tx.sellDate}</span>
+                                <span>${formatNumber(tx.sellShares)} 股 × $${formatNumber(tx.sellPrice)}</span>
+                            </div>
                             ${feeBreakdownHtml}
-                            div class=flex items-center justify-between pt-1 border-t border-amber-200
-                                span class=text-[#78625C] font-bold總賣出：strong class=text-[#45322E]$${formatNumber(details.totalSell)}strongspan
-                                span class=font-black text-sm ${profitStyle}淨盈餘：${profitLabel}span
-                            div
-                        div
+                            <div class="flex items-center justify-between pt-1 border-t border-amber-200">
+                                <span class="text-[#78625C] font-bold">總賣出：<strong class="text-[#45322E]">$${formatNumber(details.totalSell)}</strong></span>
+                                <span class="font-black text-sm ${profitStyle}">淨盈餘：${profitLabel}</span>
+                            </div>
+                        </div>
                     `;
                 }
 
                 return `
-                    div class=illust-card p-4 space-y-3
-                        !-- 標頭：股票名稱 + 狀態 + 刪除按鈕 --
-                        div class=flex items-center justify-between
-                            div class=flex items-center gap-2 flex-wrap
-                                h3 class=text-base font-black text-[#45322E]${tx.name}h3
+                    <div class="illust-card p-4 space-y-3">
+                        <!-- 標頭：股票名稱 + 狀態 + 刪除按鈕 -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h3 class="text-base font-black text-[#45322E]">${tx.name}</h3>
                                 ${statusBadge}
-                            div
-                            button onclick=deleteTransaction('${tx.id}') 
-                                class=p-1.5 text-stone-400 hovertext-rose-600 rounded-lg cursor-pointer title=刪除紀錄
-                                i data-lucide=trash-2 class=w-4 h-4i
-                            button
-                        div
+                            </div>
+                            <button onclick="deleteTransaction('${tx.id}')" 
+                                class="p-1.5 text-stone-400 hover:text-rose-600 rounded-lg cursor-pointer" title="刪除紀錄">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
 
-                        !-- 購買資訊主欄 --
-                        div class=bg-[#FEF9E7] rounded-2xl p-3 border border-[#E6D8C3] flex items-center justify-between text-xs
-                            div class=space-y-1
-                                div class=font-bold text-[#78625C]📥 買入日期：${tx.buyDate}div
-                                div class=font-bold text-[#45322E]${formatNumber(tx.buyShares)} 股 × 單價 $${formatNumber(tx.buyPrice)}div
-                                ${buyFee  0  `div class=text-[11px] font-bold text-amber-700買進手續費：$${formatNumber(buyFee)}div`  ''}
-                            div
-                            div class=text-right
-                                span class=text-[11px] font-bold text-[#78625C] block總購買金額span
-                                span class=text-base font-black text-[#45322E]$${formatNumber(totalBuy)}span
-                            div
-                        div
+                        <!-- 購買資訊主欄 -->
+                        <div class="bg-[#FEF9E7] rounded-2xl p-3 border border-[#E6D8C3] flex items-center justify-between text-xs">
+                            <div class="space-y-1">
+                                <div class="font-bold text-[#78625C]">📥 買入日期：${tx.buyDate}</div>
+                                <div class="font-bold text-[#45322E]">${formatNumber(tx.buyShares)} 股 × 單價 $${formatNumber(tx.buyPrice)}</div>
+                                ${buyFee > 0 ? `<div class="text-[11px] font-bold text-amber-700">買進手續費：$${formatNumber(buyFee)}</div>` : ''}
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[11px] font-bold text-[#78625C] block">總購買金額</span>
+                                <span class="text-base font-black text-[#45322E]">$${formatNumber(totalBuy)}</span>
+                            </div>
+                        </div>
 
-                        !-- 若有賣出紀錄，直接顯示於購買處下方 --
+                        <!-- 若有賣出紀錄，直接顯示於購買處下方 -->
                         ${sellSectionHtml}
 
-                        !-- 底部操作按鈕：在購買處點擊登記編輯賣出 --
-                        div class=pt-0.5
-                            button onclick=openSellModal('${tx.id}')
-                                class=w-full illust-btn ${hasSold  'bg-white hoverbg-amber-50'  'bg-[#FDE047] hoverbg-[#FACC15]'} text-[#45322E] font-black text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer
-                                i data-lucide=badge-dollar-sign class=w-4 h-4i
-                                span${hasSold  '編輯賣出時間  股數  稅費盈餘'  '登記賣出 (計算總賣出與淨盈餘)'}span
-                            button
-                        div
-                    div
+                        <!-- 底部操作按鈕：在購買處點擊登記/編輯賣出 -->
+                        <div class="pt-0.5">
+                            <button onclick="openSellModal('${tx.id}')"
+                                class="w-full illust-btn ${hasSold ? 'bg-white hover:bg-amber-50' : 'bg-[#FDE047] hover:bg-[#FACC15]'} text-[#45322E] font-black text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer">
+                                <i data-lucide="badge-dollar-sign" class="w-4 h-4"></i>
+                                <span>${hasSold ? '編輯賣出時間 / 股數 / 稅費盈餘' : '登記賣出 (計算總賣出與淨盈餘)'}</span>
+                            </button>
+                        </div>
+                    </div>
                 `;
             }).join('');
         }
-    script
+    </script>
+</body>
+</html>
