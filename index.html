@@ -110,11 +110,10 @@
     <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm pointer-events-none flex flex-col gap-2"></div>
 
     <!-- ========================================== -->
-    <!-- 頂部置頂區：插圖標題 + 快速手續費設定 -->
+    <!-- 頂部置頂區：插圖標題 + 快速手續費與API設定 -->
     <!-- ========================================== -->
     <header class="sticky top-0 z-30 bg-[#FEF9E7]/95 backdrop-blur-md pt-3 pb-3 px-4 border-b-2 border-[#E6D8C3]">
         <div class="max-w-lg mx-auto">
-            <!-- 品牌插圖列 + 手續費折數按鈕 -->
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                     <!-- 可愛手繪小財神貓咪 SVG 插圖 -->
@@ -151,35 +150,37 @@
     <!-- ========================================== -->
     <main class="max-w-lg mx-auto px-4 pt-4 space-y-6">
 
-        <!-- 區塊 1：單筆輸入 (股票代號自動連結股票、時間、股數、金額、手續費、總購買金額) -->
+        <!-- 區塊 1：單筆輸入 -->
         <section id="section-add" class="illust-card p-4 sm:p-5 relative">
             <div class="flex items-center justify-between mb-3.5">
                 <div class="flex items-center gap-2">
                     <span class="w-7 h-7 rounded-full bg-[#FDE047] border-2 border-[#45322E] flex items-center justify-center text-sm font-black">✏️</span>
                     <h2 class="text-base sm:text-lg font-black text-[#45322E]">新增單筆購買</h2>
                 </div>
-                <span class="text-[11px] font-bold text-[#78625C] bg-[#FEF9E7] px-2.5 py-1 rounded-full border border-[#E6D8C3]">輸入代號自動帶出名稱</span>
+                <span class="text-[11px] font-bold text-[#78625C] bg-[#FEF9E7] px-2.5 py-1 rounded-full border border-[#E6D8C3]">代碼與名稱雙向連動</span>
             </div>
 
             <form id="buy-form" class="space-y-3">
-                <!-- 第一列：代號 + 股票 (輸入代號自動帶出股票名稱) -->
+                <!-- 第一列：代號 + 股票 -->
                 <div class="grid grid-cols-12 gap-2.5">
                     <div class="col-span-5">
                         <label class="block text-xs font-bold text-[#45322E] mb-1">🔍 股票代號 *</label>
-                        <input type="text" id="buy-code" required placeholder="如: 0050" autocomplete="off"
+                        <input type="text" id="buy-code" required placeholder="如: 0050" autocomplete="off" list="stock-code-datalist"
                             class="illust-input w-full px-3 py-2.5 text-sm font-black uppercase">
+                        <datalist id="stock-code-datalist"></datalist>
                     </div>
                     <div class="col-span-7">
                         <div class="flex items-center justify-between mb-1">
                             <label class="block text-xs font-bold text-[#45322E]">📌 股票 *</label>
-                            <span id="code-lookup-status" class="text-[10px] font-bold text-amber-600 hidden">搜尋中...</span>
+                            <span id="code-lookup-status" class="text-[10px] font-bold text-amber-600 hidden">查詢中...</span>
                         </div>
-                        <input type="text" id="buy-name" required placeholder="自動帶出或手動輸入"
+                        <input type="text" id="buy-name" required placeholder="自動帶出或手動輸入" list="stock-name-datalist"
                             class="illust-input w-full px-3 py-2.5 text-sm font-bold">
+                        <datalist id="stock-name-datalist"></datalist>
                     </div>
                 </div>
 
-                <!-- 第二列：購買時間 (日期表) -->
+                <!-- 第二列：購買時間 -->
                 <div>
                     <label class="block text-xs font-bold text-[#45322E] mb-1">📅 購買時間 *</label>
                     <input type="date" id="buy-date" required
@@ -200,7 +201,7 @@
                     </div>
                 </div>
 
-                <!-- 第四列：買進手續費 (自動計算，若無可填0忽略) -->
+                <!-- 第四列：買進手續費 -->
                 <div class="bg-[#FFFBEB] border border-[#E6D8C3] rounded-2xl p-3 flex items-center justify-between gap-3">
                     <div>
                         <label class="block text-xs font-bold text-[#45322E]">🧾 買進手續費 (無則填 0)</label>
@@ -240,7 +241,6 @@
                         <span id="last-price-update-time" class="text-[10px] font-bold text-[#78625C] block">可自動搜尋或手動輸入現價</span>
                     </div>
                 </div>
-                <!-- 一鍵重新整理並自動搜尋目前股價按鈕 -->
                 <button id="refresh-prices-btn" onclick="autoFetchCurrentPrices()"
                     class="illust-btn bg-[#FDE047] hover:bg-[#FACC15] text-[#45322E] font-black text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 shrink-0 cursor-pointer">
                     <i id="refresh-prices-icon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
@@ -249,12 +249,10 @@
             </div>
 
             <!-- 持股卡片動態渲染區 -->
-            <div id="holdings-list" class="space-y-3">
-                <!-- JS 動態生成 -->
-            </div>
+            <div id="holdings-list" class="space-y-3"></div>
         </section>
 
-        <!-- 區塊 3：單筆買入與賣出結算明細 (含手續費及管理費/證交稅與淨盈餘) -->
+        <!-- 區塊 3：單筆買入與賣出結算明細 -->
         <section id="section-history" class="space-y-3">
             <div class="flex items-center justify-between px-1">
                 <div class="flex items-center gap-2">
@@ -265,9 +263,7 @@
             </div>
 
             <!-- 交易卡片動態渲染區 -->
-            <div id="transactions-list" class="space-y-3.5">
-                <!-- JS 動態生成 -->
-            </div>
+            <div id="transactions-list" class="space-y-3.5"></div>
         </section>
 
     </main>
@@ -299,8 +295,7 @@
     <!-- 登記賣出與稅費盈餘結算 Modal 視窗 -->
     <!-- ========================================== -->
     <div id="sell-modal" class="fixed inset-0 z-50 hidden bg-[#45322E]/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-[#FFFDF7] border-t-[3px] sm:border-[3px] border-[#45322E] rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-[slideUp_0.2s_ease-out] max-h-[92vh] overflow-y-auto">
-            <!-- Modal 標頭 -->
+        <div class="bg-[#FFFDF7] border-t-[3px] sm:border-[3px] border-[#45322E] rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl max-h-[92vh] overflow-y-auto">
             <div class="bg-[#FDE047] px-5 py-3.5 border-b-2 border-[#45322E] flex items-center justify-between sticky top-0 z-10">
                 <div class="flex items-center gap-2">
                     <span class="text-lg">💸</span>
@@ -314,7 +309,6 @@
             <form id="sell-form" class="p-5 space-y-3.5">
                 <input type="hidden" id="sell-tx-id">
 
-                <!-- 原始購買摘要 -->
                 <div class="bg-[#FEF9E7] border-2 border-[#E6D8C3] rounded-2xl p-3 text-xs space-y-1">
                     <div class="flex justify-between">
                         <span class="text-[#78625C] font-bold">股票：</span>
@@ -330,7 +324,6 @@
                     </div>
                 </div>
 
-                <!-- 賣出時間與股數 -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-[#45322E] mb-1">📅 賣出時間 *</label>
@@ -346,14 +339,12 @@
                     </div>
                 </div>
 
-                <!-- 賣出金額(單價) -->
                 <div>
                     <label class="block text-xs font-bold text-[#45322E] mb-1">🏷️ 賣出金額 (單價) *</label>
                     <input type="number" id="sell-price" required min="0.0001" step="any" inputmode="decimal" placeholder="輸入賣出成交單價"
                         class="illust-input w-full px-3.5 py-2.5 text-sm font-bold">
                 </div>
 
-                <!-- 賣出手續費與證交稅/管理費 (自動帶入，無則填0忽略) -->
                 <div class="grid grid-cols-2 gap-3 bg-[#FFFBEB] border border-[#E6D8C3] rounded-2xl p-3">
                     <div>
                         <label class="block text-[11px] font-bold text-[#45322E] mb-1">🧾 賣出手續費</label>
@@ -376,7 +367,6 @@
                     </div>
                 </div>
 
-                <!-- 即時計算：總賣出金額、各項費用與淨盈餘 -->
                 <div class="bg-[#FEF3C7] border-2 border-[#45322E] rounded-2xl p-3.5 space-y-2">
                     <div class="flex justify-between items-center text-xs font-bold">
                         <span class="text-[#78625C]">總賣出金額 (賣出股數×金額)：</span>
@@ -395,7 +385,6 @@
                     </div>
                 </div>
 
-                <!-- 底部按鈕 -->
                 <div class="flex items-center gap-2 pt-1">
                     <button type="button" id="clear-sell-btn" onclick="clearSellRecord()"
                         class="hidden illust-btn bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-xs px-3.5 py-3 rounded-xl cursor-pointer">
@@ -410,13 +399,13 @@
         </div>
     </div>
 
-    <!-- 手續費折數設定 Modal -->
+    <!-- 手續費折數與雲端連線設定 Modal -->
     <div id="fee-settings-modal" class="fixed inset-0 z-50 hidden bg-[#45322E]/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-[#FFFDF7] border-[3px] border-[#45322E] rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
             <div class="bg-[#FDE047] px-5 py-3.5 border-b-2 border-[#45322E] flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <span class="text-lg">⚙️</span>
-                    <h3 class="text-base font-black text-[#45322E]">券商手續費折數設定</h3>
+                    <h3 class="text-base font-black text-[#45322E]">手續費與進階設定</h3>
                 </div>
                 <button onclick="closeFeeSettingsModal()" class="w-7 h-7 rounded-full bg-white border-2 border-[#45322E] flex items-center justify-center text-[#45322E] cursor-pointer">
                     <i data-lucide="x" class="w-4 h-4"></i>
@@ -424,10 +413,10 @@
             </div>
             <div class="p-5 space-y-4">
                 <p class="text-xs text-[#78625C] leading-relaxed">
-                    台股標準手續費為 <strong>0.1425%</strong>，ETF 證交稅為 <strong>0.1%</strong>，一般股票證交稅為 <strong>0.3%</strong>。若該標的不收費用，輸入時填 <strong>0</strong> 即可忽略。
+                    台股標準手續費為 <strong>0.1425%</strong>，ETF 證交稅為 <strong>0.1%</strong>，一般股票為 <strong>0.3%</strong>。無費用標的填 <strong>0</strong> 即可忽略。
                 </p>
                 <div>
-                    <label class="block text-xs font-bold text-[#45322E] mb-1.5">預設電子下單折數 (如 6 折填 6，無折扣填 10，免手續費填 0)</label>
+                    <label class="block text-xs font-bold text-[#45322E] mb-1.5">預設電子下單折數 (6 折填 6，無折扣填 10，免手續費填 0)</label>
                     <div class="flex items-center gap-2">
                         <input type="number" id="fee-discount-input" min="0" max="10" step="0.1" inputmode="decimal"
                             class="illust-input w-full px-3.5 py-2 text-base font-black text-center">
@@ -439,6 +428,15 @@
                         <button type="button" onclick="setQuickDiscount(6)" class="flex-1 text-xs font-bold bg-amber-100 hover:bg-amber-200 border border-[#45322E] py-1.5 rounded-xl cursor-pointer">6折</button>
                     </div>
                 </div>
+
+                <!-- 選填 Gemini API Key 以在 GitHub Pages 上啟用 AI 智慧搜尋 -->
+                <div class="border-t border-[#E6D8C3] pt-3">
+                    <label class="block text-xs font-bold text-[#45322E] mb-1">🔑 Gemini API Key (選填，僅存於本機)</label>
+                    <input type="password" id="gemini-apikey-input" placeholder="部署網頁若需查冷門股可貼上金鑰"
+                        class="illust-input w-full px-3 py-2 text-xs font-bold">
+                    <span class="text-[10px] text-[#78625C] block mt-1">一般常用台股與 ETF 已內建離線字典，免金鑰即可自動連動。</span>
+                </div>
+
                 <button type="button" onclick="saveFeeSettings()"
                     class="w-full illust-btn bg-[#FACC15] hover:bg-[#FDE047] text-[#45322E] font-black text-sm py-2.5 rounded-xl cursor-pointer">
                     儲存設定
@@ -450,11 +448,13 @@
     <!-- JavaScript 邏輯 -->
     <script>
         // ==========================================
-        // 1. 本地儲存鍵值與初始資料
+        // 1. 本地儲存鍵值與擴充版台股/ETF離線字典
         // ==========================================
         const STORAGE_KEY_TX = 'yellow_stock_tracker_tx_v1';
         const STORAGE_KEY_PRICES = 'yellow_stock_tracker_prices_v1';
         const STORAGE_KEY_FEE_DISCOUNT = 'yellow_stock_tracker_fee_discount_v1';
+        const STORAGE_KEY_API_KEY = 'yellow_stock_tracker_gemini_key_v1';
+        const STORAGE_KEY_CUSTOM_DICT = 'yellow_stock_tracker_custom_dict_v1';
 
         const defaultTransactions = [
             {
@@ -503,44 +503,60 @@
             '0050 元大台灣50': 182.0
         };
 
-        // 常見台股與 ETF 代號快速對應字典 (輸入代號即時帶出股票名稱)
+        // 擴充超過 150 檔常見台灣股票與 ETF 字典 (部署至 GitHub Pages 免 API 即可秒速連動)
         const STOCK_CODE_DICTIONARY = {
-            '0050': '元大台灣50',
-            '0056': '元大高股息',
-            '00878': '國泰永續高股息',
-            '00919': '群益台灣精選高息',
-            '00929': '復華台灣科技優息',
-            '006208': '富邦台50',
-            '00713': '元大台灣高息低波',
-            '00940': '元大台灣價值高息',
-            '00679B': '元大美債20年',
-            '00687B': '國泰20年美債',
-            '2330': '台積電',
-            '2317': '鴻海',
-            '2454': '聯發科',
-            '2308': '台達電',
-            '2382': '廣達',
-            '2881': '富邦金',
-            '2882': '國泰金',
-            '2891': '中信金',
-            '2886': '兆豐金',
-            '2884': '玉山金',
-            '2412': '中華電',
-            '2603': '長榮',
-            '2609': '陽明',
-            '2615': '萬海',
-            '3008': '大立光',
-            '3231': '緯創',
-            '2357': '華碩',
-            '2303': '聯電',
-            '2002': '中鋼',
-            '1216': '統一'
+            // 熱門市值/高股息/主題/槓桿 ETF
+            '0050': '元大台灣50', '0051': '元大中型100', '0052': '富邦科技', '0053': '元大電子',
+            '0055': '元大MSCI金融', '0056': '元大高股息', '0057': '富邦摩台', '0061': '元大寶滬深',
+            '006203': '元大MSCI台灣', '006204': '永豐臺灣加權', '006205': '富邦上証', '006206': '元大上證50',
+            '006207': 'FH滬深', '006208': '富邦台50', '00631L': '元大台灣50正2', '00632R': '元大台灣50反1',
+            '00646': '元大S&P500', '00662': '富邦NASDAQ', '00675L': '富邦臺灣加權正2', '00676R': '富邦臺灣加權反1',
+            '00692': '富邦公司治理', '00701': '國泰股利精選30', '00713': '元大台灣高息低波', '00728': '第一金工業30',
+            '00730': '富邦臺灣優質高息', '00731': 'FH富時高息低波', '00733': '富邦臺灣中小', '00757': '統一FANG+',
+            '00830': '國泰費城半導體', '00850': '元大臺灣ESG永續', '00878': '國泰永續高股息', '00881': '國泰台灣5G+',
+            '00882': '中信中國高股息', '00891': '中信關鍵半導體', '00892': '富邦台灣半導體', '00893': '國泰智能電動車',
+            '00900': '富邦特選高股息30', '00904': '新光臺灣半導體30', '00905': 'FT臺灣Smart', '00907': '永豐優息存股',
+            '00912': '中信臺灣智慧50', '00915': '凱基優選高股息30', '00918': '大華優利高填息30', '00919': '群益台灣精選高息',
+            '00922': '國泰台灣領袖50', '00923': '群益台ESG低碳50', '00927': '群益半導體收益', '00929': '復華台灣科技優息',
+            '00930': '永豐ESG低碳高息', '00932': '兆豐永續高息等權', '00934': '中信成長高股息', '00935': '野村臺灣新科技50',
+            '00936': '台新永續高息中小', '00939': '統一台灣高息動能', '00940': '元大台灣價值高息', '00941': '中信上游半導體',
+            '00943': '兆豐電子高息等權', '00944': '野村趨勢動能高息', '00946': '群益科技高息成長', '00950B': '凱基A級公司債',
+            // 熱門債券 ETF
+            '00679B': '元大美債20年', '00687B': '國泰20年美債', '00696B': '富邦美債20年', '00720B': '元大投資級公司債',
+            '00725B': '國泰投資級公司債', '00740B': '富邦全球投等債', '00751B': '元大AAA至A公司債', '00764B': '群益25年美債',
+            '00772B': '中信高評級公司債', '00795B': '中信美國公債20年', '00933B': '國泰10Y+金融債', '00937B': '群益ESG投等債20+',
+            // 熱門電子/半導體/AI 權值股
+            '2330': '台積電', '2317': '鴻海', '2454': '聯發科', '2308': '台達電', '2382': '廣達',
+            '2303': '聯電', '3711': '日月光投控', '2357': '華碩', '3231': '緯創', '6669': '緯穎',
+            '2376': '技嘉', '2377': '微星', '2356': '英業達', '4938': '和碩', '2324': '仁寶',
+            '2353': '宏碁', '2301': '光寶科', '2395': '研華', '3008': '大立光', '3034': '聯詠',
+            '2379': '瑞昱', '3037': '欣興', '3189': '景碩', '8046': '南電', '2345': '智邦',
+            '2327': '國巨', '2492': '華新科', '2408': '南亞科', '2344': '華邦電', '2337': '旺宏',
+            '3443': '創意', '3661': '世芯-KY', '5269': '祥碩', '6415': '矽力*-KY', '3529': '力旺',
+            '2383': '台光電', '6213': '聯茂', '6274': '台燿', '3017': '奇鋐', '3324': '雙鴻',
+            '2059': '川湖', '1513': '中興電', '1519': '華城', '1503': '士電', '1504': '東元',
+            '2368': '金像電', '2313': '華通', '3044': '健鼎', '4958': '臻鼎-KY', '2449': '京元電子',
+            '6239': '力成', '3702': '大聯大', '3036': '文曄', '5347': '世界', '6488': '環球晶',
+            '5483': '中美晶', '8299': '群聯', '3293': '鈊象', '8069': '元太', '3481': '群創',
+            '2409': '友達', '2354': '鴻準', '2360': '致茂', '2474': '可成', '2049': '上銀',
+            // 熱門金融股
+            '2881': '富邦金', '2882': '國泰金', '2891': '中信金', '2886': '兆豐金', '2884': '玉山金',
+            '2885': '元大金', '2892': '第一金', '5880': '合庫金', '2880': '華南金', '2883': '凱基金',
+            '2887': '台新金', '2890': '永豐金', '2888': '新光金', '2801': '彰銀', '2834': '臺企銀',
+            '5876': '上海商銀', '2812': '台中銀', '2809': '京城銀', '2845': '遠東銀', '5871': '中租-KY',
+            // 熱門傳產/航運/電信/食品/水泥/鋼鐵
+            '2603': '長榮', '2609': '陽明', '2615': '萬海', '2618': '長榮航', '2610': '華航',
+            '2412': '中華電', '3045': '台灣大', '4904': '遠傳', '1216': '統一', '2912': '統一超',
+            '2002': '中鋼', '1101': '台泥', '1102': '亞泥', '1301': '台塑', '1303': '南亞',
+            '1326': '台化', '6505': '台塑化', '9910': '豐泰', '9904': '寶成', '1476': '儒鴻',
+            '1477': '聚陽', '2207': '和泰車', '2201': '裕隆', '9921': '巨大', '9914': '美利達',
+            '2542': '興富發', '2501': '國建', '9945': '潤泰新', '2915': '潤泰全', '8454': '富邦媒'
         };
 
         let transactions = [];
         let currentPrices = {};
-        let isTotalManuallyEdited = false;
-        let feeDiscount = 6; // 預設券商手續費 6 折 (0~10，0 代表免手續費)
+        let feeDiscount = 6;
+        let userGeminiApiKey = '';
         let isBuyFeeManuallyEdited = false;
         let isSellFeeManuallyEdited = false;
         let codeLookupTimer = null;
@@ -551,11 +567,19 @@
                 const savedTx = localStorage.getItem(STORAGE_KEY_TX);
                 const savedPrices = localStorage.getItem(STORAGE_KEY_PRICES);
                 const savedDiscount = localStorage.getItem(STORAGE_KEY_FEE_DISCOUNT);
+                const savedApiKey = localStorage.getItem(STORAGE_KEY_API_KEY);
+                const savedCustomDict = localStorage.getItem(STORAGE_KEY_CUSTOM_DICT);
 
                 transactions = savedTx ? JSON.parse(savedTx) : defaultTransactions;
                 currentPrices = savedPrices ? JSON.parse(savedPrices) : defaultPrices;
                 if (savedDiscount !== null && savedDiscount !== '') {
                     feeDiscount = parseFloat(savedDiscount);
+                }
+                if (savedApiKey) {
+                    userGeminiApiKey = savedApiKey;
+                }
+                if (savedCustomDict) {
+                    Object.assign(STOCK_CODE_DICTIONARY, JSON.parse(savedCustomDict));
                 }
                 updateHeaderDiscountLabel();
             } catch (e) {
@@ -570,12 +594,33 @@
                 localStorage.setItem(STORAGE_KEY_TX, JSON.stringify(transactions));
                 localStorage.setItem(STORAGE_KEY_PRICES, JSON.stringify(currentPrices));
                 localStorage.setItem(STORAGE_KEY_FEE_DISCOUNT, String(feeDiscount));
+                localStorage.setItem(STORAGE_KEY_API_KEY, userGeminiApiKey);
             } catch (e) {
                 console.warn('無法儲存至本地端', e);
             }
         }
 
-        // 依據代號與金額計算手續費與證交稅/管理費
+        function saveCustomStockToDict(code, name) {
+            if (!code || !name) return;
+            STOCK_CODE_DICTIONARY[code] = name;
+            try {
+                const existing = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM_DICT) || '{}');
+                existing[code] = name;
+                localStorage.setItem(STORAGE_KEY_CUSTOM_DICT, JSON.stringify(existing));
+                populateStockDatalists();
+            } catch (e) {}
+        }
+
+        function populateStockDatalists() {
+            const codeList = document.getElementById('stock-code-datalist');
+            const nameList = document.getElementById('stock-name-datalist');
+            if (!codeList || !nameList) return;
+
+            const entries = Object.entries(STOCK_CODE_DICTIONARY);
+            codeList.innerHTML = entries.map(([c, n]) => `<option value="${c}">${c} ${n}</option>`).join('');
+            nameList.innerHTML = entries.map(([c, n]) => `<option value="${n}">${c} ${n}</option>`).join('');
+        }
+
         function estimateBrokerFee(amount) {
             if (!amount || amount <= 0 || feeDiscount <= 0) return 0;
             const rawFee = amount * 0.001425 * (feeDiscount / 10);
@@ -585,7 +630,6 @@
         function getTaxRateByStockName(stockName) {
             const codeMatch = (stockName || '').trim().match(/^([A-Za-z0-9]+)/);
             const code = codeMatch ? codeMatch[1].toUpperCase() : '';
-            // 台灣債券 ETF (代號結尾為 B) 免證交稅；一般 ETF (00 開頭) 證交稅 0.1%；一般股票 0.3%
             if (/^00\d+B$/.test(code)) return 0;
             if (code.startsWith('00')) return 0.001;
             return 0.003;
@@ -606,6 +650,7 @@
 
         function openFeeSettingsModal() {
             document.getElementById('fee-discount-input').value = feeDiscount;
+            document.getElementById('gemini-apikey-input').value = userGeminiApiKey;
             document.getElementById('fee-settings-modal').classList.remove('hidden');
         }
 
@@ -624,12 +669,13 @@
                 return;
             }
             feeDiscount = val;
+            userGeminiApiKey = document.getElementById('gemini-apikey-input').value.trim();
             updateHeaderDiscountLabel();
             saveData();
             closeFeeSettingsModal();
             isBuyFeeManuallyEdited = false;
             updateBuyPreview();
-            showToast(feeDiscount === 0 ? '已設為免手續費！' : `已更新為手續費 ${feeDiscount} 折！`);
+            showToast('設定已儲存！');
         }
 
         // ==========================================
@@ -637,16 +683,19 @@
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
+            populateStockDatalists();
 
-            // 預設今天日期
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('buy-date').value = today;
 
-            // 股票代號與股票名稱雙向自動連動監聽
-            document.getElementById('buy-code').addEventListener('input', handleStockCodeInput);
-            document.getElementById('buy-name').addEventListener('input', handleStockNameInput);
+            // 股票代號與股票名稱雙向自動連動監聽 (同時支援 input 與 change 確保手機選單/自動完成即時觸發)
+            const codeEl = document.getElementById('buy-code');
+            const nameEl = document.getElementById('buy-name');
+            codeEl.addEventListener('input', handleStockCodeInput);
+            codeEl.addEventListener('change', handleStockCodeInput);
+            nameEl.addEventListener('input', handleStockNameInput);
+            nameEl.addEventListener('change', handleStockNameInput);
 
-            // 購買輸入即時計算
             document.getElementById('buy-shares').addEventListener('input', updateBuyPreview);
             document.getElementById('buy-price').addEventListener('input', updateBuyPreview);
             document.getElementById('buy-fee').addEventListener('input', () => {
@@ -654,7 +703,6 @@
             });
             document.getElementById('buy-form').addEventListener('submit', handleAddBuy);
 
-            // 賣出 Modal 即時試算
             document.getElementById('sell-shares').addEventListener('input', () => {
                 isSellFeeManuallyEdited = false;
                 updateSellModalPreview();
@@ -711,10 +759,42 @@
         }
 
         // ==========================================
-        // 4. 股票代碼與名稱雙向自動連動邏輯
+        // 3. 股票代碼與名稱雙向自動連動邏輯 (支援離線字典 + 公開接口 + Gemini)
         // ==========================================
+        async function fetchStockInfoFromPublicTwse(code) {
+            // 嘗試透過台灣證交所 MIS 公開即時接口查詢 (透過公開 CORS 代理)
+            const targets = [`tse_${code}.tw`, `otc_${code}.tw`];
+            for (const target of targets) {
+                try {
+                    const twseUrl = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${target}&json=1&delay=0`;
+                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(twseUrl)}`;
+                    const res = await fetch(proxyUrl);
+                    if (!res.ok) continue;
+                    const wrapper = await res.json();
+                    const parsed = JSON.parse(wrapper.contents);
+                    const info = parsed?.msgArray?.[0];
+                    if (info && info.n) {
+                        const rawPrice = info.z && info.z !== '-' ? parseFloat(info.z) : (info.y && info.y !== '-' ? parseFloat(info.y) : null);
+                        return { name: info.n.trim(), price: rawPrice };
+                    }
+                } catch (e) {
+                    // 忽略單一通道錯誤繼續嘗試
+                }
+            }
+            return null;
+        }
+
         async function handleStockCodeInput(e) {
-            const code = e.target.value.trim().toUpperCase();
+            const rawVal = e.target.value.trim().toUpperCase();
+            // 若從 datalist 選取了 "0050 元大台灣50"，自動拆開代碼與名稱
+            const spaceMatch = rawVal.match(/^([0-9]{4,6}[A-Z]?)\s+(.+)$/);
+            if (spaceMatch) {
+                e.target.value = spaceMatch[1];
+                document.getElementById('buy-name').value = spaceMatch[2].trim();
+                return;
+            }
+
+            const code = rawVal;
             const nameInput = document.getElementById('buy-name');
             const statusEl = document.getElementById('code-lookup-status');
 
@@ -728,41 +808,54 @@
                 return;
             }
 
-            // 1. 優先比對內建常見台股/ETF字典 (毫秒級即時帶出)
+            // 1. 優先比對內建與已快取字典 (部署後 100% 離線秒速連動)
             if (STOCK_CODE_DICTIONARY[code]) {
                 nameInput.value = STOCK_CODE_DICTIONARY[code];
                 statusEl.classList.add('hidden');
                 return;
             }
 
-            // 2. 若為 4~6 碼代號且不在字典中，透過 Gemini + Google Search 自動查詢名稱
+            // 2. 若不在字典中且符合台股代號格式，先查證交所公開資料，若有設定 API Key 則再用 Gemini 輔助
             if (/^[0-9]{4,6}[A-Z]?$/.test(code)) {
                 statusEl.textContent = '查詢中...';
                 statusEl.classList.remove('hidden');
 
                 codeLookupTimer = setTimeout(async () => {
                     try {
-                        const apiKey = "";
-                        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-                        const prompt = `請查詢台灣股票或ETF代號「${code}」的中文簡稱（例如 0050 為 元大台灣50，2330 為 台積電）。請只回傳中文簡稱本身，不要包含代號、標點符號或其他解釋文字。若查無此代號請回傳 NONE。`;
+                        // 方法 A：免金鑰查詢台灣證交所/櫃買公開資料
+                        const twseInfo = await fetchStockInfoFromPublicTwse(code);
+                        const currentCode = document.getElementById('buy-code').value.trim().toUpperCase();
+                        if (twseInfo && twseInfo.name && currentCode === code) {
+                            nameInput.value = twseInfo.name;
+                            saveCustomStockToDict(code, twseInfo.name);
+                            statusEl.classList.add('hidden');
+                            return;
+                        }
 
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{ parts: [{ text: prompt }] }],
-                                tools: [{ google_search: {} }]
-                            })
-                        });
+                        // 方法 B：若有環境變數或使用者設定的 Gemini API Key，使用 Google Search 查詢
+                        const apiKey = userGeminiApiKey || "";
+                        if (apiKey) {
+                            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                            const prompt = `請查詢台灣股票或ETF代號「${code}」的中文簡稱（例如 0050 為 元大台灣50，2330 為 台積電）。請只回傳中文簡稱本身，不要包含代號、標點符號或其他解釋文字。若查無此代號請回傳 NONE。`;
 
-                        if (response.ok) {
-                            const data = await response.json();
-                            const resultText = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
-                            const currentCode = document.getElementById('buy-code').value.trim().toUpperCase();
-                            if (currentCode === code && resultText && resultText !== 'NONE' && resultText.length <= 20) {
-                                const cleanName = resultText.replace(new RegExp(`^${code}\\s*`), '').trim();
-                                nameInput.value = cleanName;
-                                STOCK_CODE_DICTIONARY[code] = cleanName; // 快取結果
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    contents: [{ parts: [{ text: prompt }] }],
+                                    tools: [{ google_search: {} }]
+                                })
+                            });
+
+                            if (response.ok) {
+                                const data = await response.json();
+                                const resultText = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+                                const latestCode = document.getElementById('buy-code').value.trim().toUpperCase();
+                                if (latestCode === code && resultText && resultText !== 'NONE' && resultText.length <= 20) {
+                                    const cleanName = resultText.replace(new RegExp(`^${code}\\s*`), '').trim();
+                                    nameInput.value = cleanName;
+                                    saveCustomStockToDict(code, cleanName);
+                                }
                             }
                         }
                     } catch (err) {
@@ -770,7 +863,7 @@
                     } finally {
                         statusEl.classList.add('hidden');
                     }
-                }, 600);
+                }, 500);
             } else {
                 statusEl.classList.add('hidden');
             }
@@ -782,7 +875,6 @@
             const codeInput = document.getElementById('buy-code');
             if (!val) return;
 
-            // 若使用者直接輸入如 "0050 元大台灣50"，自動拆開填入
             const combinedMatch = val.match(/^([0-9]{4,6}[A-Za-z]?)\s+(.+)$/);
             if (combinedMatch) {
                 codeInput.value = combinedMatch[1].toUpperCase();
@@ -790,17 +882,17 @@
                 return;
             }
 
-            // 比對字典名稱反向帶入代碼
+            // 完全比對或部分比對字典名稱反向帶入代碼
             for (const [dictCode, dictName] of Object.entries(STOCK_CODE_DICTIONARY)) {
                 if (dictName === val) {
                     codeInput.value = dictCode;
-                    break;
+                    return;
                 }
             }
         }
 
         // ==========================================
-        // 5. 新增單筆購買
+        // 4. 新增單筆購買
         // ==========================================
         function updateBuyPreview() {
             const shares = parseFloat(document.getElementById('buy-shares').value) || 0;
@@ -829,7 +921,9 @@
                 return;
             }
 
-            // 組合「代號 股票名稱」方便後續合併持股與搜尋股價
+            // 自動記憶這組新輸入的代號與名稱，下次輸入立即連動
+            saveCustomStockToDict(code, stockTitle);
+
             const name = stockTitle.startsWith(code) ? stockTitle : `${code} ${stockTitle}`;
 
             const newTx = {
@@ -852,7 +946,6 @@
                 currentPrices[name] = buyPrice;
             }
 
-            // 清空表單
             document.getElementById('buy-code').value = '';
             document.getElementById('buy-name').value = '';
             document.getElementById('buy-shares').value = '';
@@ -874,7 +967,7 @@
         }
 
         // ==========================================
-        // 6. 賣出 Modal 與盈餘計算邏輯 (含手續費及管理費/證交稅)
+        // 5. 賣出 Modal 與盈餘計算邏輯
         // ==========================================
         function openSellModal(id) {
             const tx = transactions.find(t => t.id === id);
@@ -929,7 +1022,6 @@
             }
         }
 
-        // 計算單筆交易對應賣出股數的分攤買進手續費
         function getProportionalBuyFee(tx, sellShares) {
             const totalBuyFee = tx.buyFee || 0;
             if (totalBuyFee <= 0 || !tx.buyShares || tx.buyShares <= 0) return 0;
@@ -937,7 +1029,6 @@
             return Math.round(totalBuyFee * ratio);
         }
 
-        // 計算單筆交易的賣出淨盈餘 (總賣出金額 - 對應買入成本 - 買進手續費 - 賣出手續費 - 證交稅/管理費)
         function calculateTxProfitDetails(tx, sellShares, sellPrice, sellFee, sellTax) {
             if (!sellShares || sellShares <= 0 || !sellPrice || sellPrice <= 0) {
                 return { totalSell: 0, correspondingCost: 0, proportionalBuyFee: 0, totalFees: 0, netProfit: 0 };
@@ -1054,7 +1145,7 @@
         }
 
         // ==========================================
-        // 7. 持股彙整、平均股價、現在股價與一鍵自動搜尋更新
+        // 6. 持股彙整、平均股價、現在股價與一鍵自動搜尋更新
         // ==========================================
         function getActiveStockNames() {
             const names = new Set();
@@ -1074,7 +1165,6 @@
             }
         }
 
-        // 一鍵重新整理，透過 Gemini API + Google Search 自動搜尋最新股價
         async function autoFetchCurrentPrices() {
             const stockNames = getActiveStockNames();
             if (stockNames.length === 0) {
@@ -1092,50 +1182,60 @@
             text.textContent = '搜尋股價中...';
 
             try {
-                const apiKey = "";
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                let updatedCount = 0;
 
-                const prompt = `請查詢以下台灣股票或ETF的最新即時股價（或最近一個交易日的收盤價，純數字台幣元）：
-${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
+                // 優先嘗試免金鑰公開證交所即時股價查詢
+                for (const stockName of stockNames) {
+                    const codeMatch = stockName.match(/^([0-9]{4,6}[A-Za-z]?)/);
+                    if (codeMatch) {
+                        const info = await fetchStockInfoFromPublicTwse(codeMatch[1].toUpperCase());
+                        if (info && info.price && info.price > 0) {
+                            currentPrices[stockName] = info.price;
+                            updatedCount++;
+                        }
+                    }
+                }
+
+                // 若仍有未更新到的股票，且有設定 Gemini API Key，則透過 Gemini + Google Search 查詢
+                const remainingNames = stockNames.filter(n => !n.match(/^([0-9]{4,6}[A-Za-z]?)/) || updatedCount === 0);
+                const apiKey = userGeminiApiKey || "";
+                if (remainingNames.length > 0 && apiKey) {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                    const prompt = `請查詢以下台灣股票或ETF的最新即時股價（或最近一個交易日的收盤價，純數字台幣元）：
+${remainingNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
 
 請嚴格回傳 JSON 格式陣列，不要包含任何 Markdown 標記或多餘文字，格式如下：
 [{"name": "股票名稱(需與上述完全一致)", "price": 股價數字}]`;
 
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        tools: [{ google_search: {} }]
-                    })
-                });
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            tools: [{ google_search: {} }]
+                        })
+                    });
 
-                if (!response.ok) {
-                    throw new Error(`API 請求失敗 (${response.status})`);
-                }
-
-                const data = await response.json();
-                const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                const jsonMatch = rawText.match(/\[[\s\S]*\]/);
-
-                if (!jsonMatch) {
-                    throw new Error('無法解析股價回傳格式');
-                }
-
-                const parsedList = JSON.parse(jsonMatch[0]);
-                let updatedCount = 0;
-
-                parsedList.forEach(item => {
-                    if (item && item.name && typeof item.price === 'number' && item.price > 0) {
-                        const matchedName = stockNames.find(
-                            s => s === item.name || s.includes(item.name) || item.name.includes(s)
-                        );
-                        if (matchedName) {
-                            currentPrices[matchedName] = item.price;
-                            updatedCount++;
+                    if (response.ok) {
+                        const data = await response.json();
+                        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+                        if (jsonMatch) {
+                            const parsedList = JSON.parse(jsonMatch[0]);
+                            parsedList.forEach(item => {
+                                if (item && item.name && typeof item.price === 'number' && item.price > 0) {
+                                    const matchedName = stockNames.find(
+                                        s => s === item.name || s.includes(item.name) || item.name.includes(s)
+                                    );
+                                    if (matchedName) {
+                                        currentPrices[matchedName] = item.price;
+                                        updatedCount++;
+                                    }
+                                }
+                            });
                         }
                     }
-                });
+                }
 
                 if (updatedCount > 0) {
                     saveData();
@@ -1144,7 +1244,7 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                     document.getElementById('last-price-update-time').textContent = `已於 ${nowStr} 自動更新最新報價`;
                     showToast(`已成功更新 ${updatedCount} 檔股票最新股價！`);
                 } else {
-                    showToast('查無對應最新股價，請稍後再試或手動輸入', 'error');
+                    showToast('目前無法取得外部即時報價，您可點擊現價欄位手動修改或至右上角設定 API Key！', 'error');
                 }
             } catch (error) {
                 console.error('自動搜尋股價失敗:', error);
@@ -1167,7 +1267,6 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
             const container = document.getElementById('holdings-list');
             const holdingsMap = {};
 
-            // 彙整尚未賣出的持股與平均股價
             transactions.forEach(tx => {
                 const remainingShares = tx.buyShares - (tx.sellShares || 0);
                 if (remainingShares > 0) {
@@ -1222,7 +1321,6 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
 
                 return `
                     <div class="illust-card p-4 space-y-3">
-                        <!-- 股票名稱與總持股數 -->
                         <div class="flex items-center justify-between border-b-2 border-dashed border-[#E6D8C3] pb-2.5">
                             <div>
                                 <h3 class="text-base font-black text-[#45322E]">${stock.name}</h3>
@@ -1233,7 +1331,6 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                             </span>
                         </div>
 
-                        <!-- 平均股價 vs 現在股價輸入 -->
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-[#FEF9E7] rounded-2xl p-3 border border-[#E6D8C3]">
                                 <span class="text-[11px] font-bold text-[#78625C] block mb-0.5">目前平均股價</span>
@@ -1252,7 +1349,6 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                             </div>
                         </div>
 
-                        <!-- 底部賺虧總結列 -->
                         <div class="flex items-center justify-between text-xs pt-1">
                             <span class="font-bold text-[#78625C]">成本 $${formatNumber(stock.totalCost)} → 市值 $${formatNumber(marketValue)}</span>
                             <span class="font-black text-sm ${amountClass}">
@@ -1289,7 +1385,6 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                     ? calculateTxProfitDetails(tx, tx.sellShares, tx.sellPrice, sellFee, sellTax)
                     : { totalSell: 0, totalFees: 0, netProfit: 0 };
 
-                // 狀態小貼紙
                 let statusBadge = '';
                 if (!hasSold) {
                     statusBadge = `<span class="text-[11px] font-bold bg-[#FEF08A] text-[#45322E] px-2.5 py-0.5 rounded-full border border-[#45322E]">🌱 持有中</span>`;
@@ -1299,7 +1394,6 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                     statusBadge = `<span class="text-[11px] font-bold bg-stone-200 text-stone-700 px-2.5 py-0.5 rounded-full border border-[#45322E]">✅ 已全數賣出</span>`;
                 }
 
-                // 賣出結算區塊 (若有賣出則顯示在購買處下方，包含手續費/稅費與淨盈餘)
                 let sellSectionHtml = '';
                 if (hasSold) {
                     let profitStyle = 'text-[#45322E]';
@@ -1312,7 +1406,6 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                         profitLabel = `-$${formatNumber(Math.abs(details.netProfit))} (虧)`;
                     }
 
-                    // 只有當該股票有產生手續費或證交稅/管理費時才顯示費用明細列，若沒有則忽略
                     const feeBreakdownHtml = details.totalFees > 0
                         ? `<div class="flex items-center justify-between text-[11px] text-[#78625C] bg-white/80 px-2.5 py-1 rounded-lg border border-amber-200">
                                <span>扣除費用明細：</span>
@@ -1337,7 +1430,6 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
 
                 return `
                     <div class="illust-card p-4 space-y-3">
-                        <!-- 標頭：股票名稱 + 狀態 + 刪除按鈕 -->
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <h3 class="text-base font-black text-[#45322E]">${tx.name}</h3>
@@ -1349,7 +1441,6 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                             </button>
                         </div>
 
-                        <!-- 購買資訊主欄 -->
                         <div class="bg-[#FEF9E7] rounded-2xl p-3 border border-[#E6D8C3] flex items-center justify-between text-xs">
                             <div class="space-y-1">
                                 <div class="font-bold text-[#78625C]">📥 買入日期：${tx.buyDate}</div>
@@ -1362,10 +1453,8 @@ ${stockNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                             </div>
                         </div>
 
-                        <!-- 若有賣出紀錄，直接顯示於購買處下方 -->
                         ${sellSectionHtml}
 
-                        <!-- 底部操作按鈕：在購買處點擊登記/編輯賣出 -->
                         <div class="pt-0.5">
                             <button onclick="openSellModal('${tx.id}')"
                                 class="w-full illust-btn ${hasSold ? 'bg-white hover:bg-amber-50' : 'bg-[#FDE047] hover:bg-[#FACC15]'} text-[#45322E] font-black text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer">
