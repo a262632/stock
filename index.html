@@ -399,7 +399,7 @@
         </div>
     </div>
 
-    <!-- 手續費折數與雲端連線設定 Modal -->
+    <!-- 手續費折數與進階設定 Modal -->
     <div id="fee-settings-modal" class="fixed inset-0 z-50 hidden bg-[#45322E]/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-[#FFFDF7] border-[3px] border-[#45322E] rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
             <div class="bg-[#FDE047] px-5 py-3.5 border-b-2 border-[#45322E] flex items-center justify-between">
@@ -448,95 +448,155 @@
     <!-- JavaScript 邏輯 -->
     <script>
         // ==========================================
-        // 1. 狀態管理、預設資料與內建台股/ETF 字典
+        // 1. 狀態管理與初始資料
         // ==========================================
-        const STORAGE_KEY_TX = 'cute_stock_tracker_transactions_v2';
-        const STORAGE_KEY_PRICES = 'cute_stock_tracker_prices_v2';
-        const STORAGE_KEY_DISCOUNT = 'cute_stock_tracker_fee_discount_v1';
+        const STORAGE_KEY_TX = 'cute_stock_tracker_tx_v1';
+        const STORAGE_KEY_PRICES = 'cute_stock_tracker_prices_v1';
+        const STORAGE_KEY_DISCOUNT = 'cute_stock_tracker_discount_v1';
         const STORAGE_KEY_CUSTOM_DICT = 'cute_stock_tracker_custom_dict_v1';
-        const STORAGE_KEY_API_KEY = 'cute_stock_tracker_gemini_key_v1';
+        const STORAGE_KEY_GEMINI_KEY = 'cute_stock_tracker_gemini_key_v1';
 
-        const BASE_STOCK_DICTIONARY = {
-            // 熱門 ETF 與高股息 / 債券 ETF
+        const BASE_BROKER_FEE_RATE = 0.001425; // 0.1425%
+        let feeDiscount = 6; // 預設 6 折
+        let userGeminiApiKey = '';
+
+        // 內建 150+ 檔台股與熱門 ETF 離線字典（確保免網路、免金鑰即可秒速雙向連動）
+        const DEFAULT_STOCK_DICTIONARY = {
+            // 熱門市值 / 高股息 / 主題 ETF
             '0050': '元大台灣50', '0051': '元大中型100', '0052': '富邦科技', '0053': '元大電子',
-            '0055': '元大MSCI金融', '0056': '元大高股息', '006208': '富邦台50', '00631L': '元大台灣50正2',
-            '00632R': '元大台灣50反1', '00646': '元大S&P500', '00662': '富邦NASDAQ', '00679B': '元大美債20年',
-            '00687B': '國泰20年美債', '00692': '富邦公司治理', '00713': '元大台灣高息低波', '00720B': '元大投資級公司債',
-            '00733': '富邦臺灣中小', '00757': '統一FANG+', '00830': '國泰費城半導體', '00850': '元大臺灣ESG永續',
-            '00878': '國泰永續高股息', '00881': '國泰台灣5G+', '00891': '中信關鍵半導體', '00892': '富邦台灣半導體',
-            '00900': '富邦特選高股息30', '00912': '中信臺灣智慧50', '00915': '凱基優選高股息30', '00918': '大華優利高填息30',
-            '00919': '群益台灣精選高息', '00922': '國泰台灣領袖50', '00923': '群益台ESG低碳50', '00927': '群益半導體收益',
-            '00929': '復華台灣科技優息', '00930': '永豐ESG低碳高息', '00932': '兆豐永續高息等權', '00934': '中信成長高股息',
-            '00935': '野村臺灣新科技50', '00936': '台新永續高息中小', '00937B': '群益ESG投等債20+', '00939': '統一台灣高息動能',
-            '00940': '元大台灣價值高息', '00941': '中信上游半導體', '00944': '野村趨勢動能高息', '00946': '群益科技高息成長',
-            // 權值電子與半導體
-            '2330': '台積電', '2317': '鴻海', '2454': '聯發科', '2308': '台達電', '2303': '聯電',
-            '3711': '日月光投控', '2382': '廣達', '3231': '緯創', '6669': '緯穎', '2357': '華碩',
-            '2376': '技嘉', '2377': '微星', '2324': '仁寶', '4938': '和碩', '2356': '英業達',
-            '2301': '光寶科', '2345': '智邦', '3034': '聯詠', '2379': '瑞昱', '3037': '欣興',
-            '2368': '金像電', '3008': '大立光', '3443': '創意', '3661': '世芯-KY', '5269': '祥碩',
-            '3017': '奇鋐', '3324': '雙鴻', '2395': '研華', '2408': '南亞科', '2344': '華邦電',
-            '3481': '群創', '2409': '友達', '2412': '中華電', '3045': '台灣大', '4904': '遠傳',
-            '2327': '國巨', '2492': '華新科', '3533': '嘉澤', '2059': '川湖', '1513': '中興電',
-            '1519': '華城', '1503': '士電', '1504': '東元', '2371': '大同', '6446': '藥華藥',
+            '0055': '元大MSCI金融', '0056': '元大高股息', '0061': '元大寶滬深', '006203': '元大MSCI台灣',
+            '006204': '永豐臺灣加權', '006205': '富邦上証', '006206': '元大上證50', '006207': '復華滬深',
+            '006208': '富邦台50', '00631L': '元大台灣50正2', '00632R': '元大台灣50反1',
+            '00646': '元大S&P500', '00662': '富邦NASDAQ', '00675L': '富邦臺灣加權正2',
+            '00676R': '富邦臺灣加權反1', '00692': '富邦公司治理', '00701': '國泰股利精選30',
+            '00713': '元大台灣高息低波', '00728': '第一金工業30', '00730': '富邦臺灣優質高息',
+            '00731': '復華富時高息低波', '00733': '富邦臺灣中小', '00735': '國泰臺韓科技',
+            '00757': '統一FANG+', '00830': '國泰費城半導體', '00850': '元大臺灣ESG永續',
+            '00861': '元大全球未來通訊', '00876': '元大全球5G', '00878': '國泰永續高股息',
+            '00881': '國泰台灣5G+', '00882': '中信中國高股息', '00885': '富邦越南',
+            '00891': '中信關鍵半導體', '00892': '富邦台灣半導體', '00893': '國泰智能電動車',
+            '00894': '中信小資高價30', '00895': '富邦未來車', '00896': '中信綠能及電動車',
+            '00900': '富邦特選高股息30', '00901': '永豐智能車供應鏈', '00902': '中信電池及儲能',
+            '00904': '新光臺灣半導體30', '00905': 'FT臺灣Smart', '00907': '永豐優息存股',
+            '00912': '中信臺灣智慧50', '00915': '凱基優選高股息30', '00918': '大華優利高填息30',
+            '00919': '群益台灣精選高息', '00921': '兆豐龍頭等權重', '00922': '國泰台灣領袖50',
+            '00923': '群益台ESG低碳50', '00927': '群益半導體收益', '00929': '復華台灣科技優息',
+            '00930': '永豐ESG低碳高息', '00932': '兆豐永續高息等權', '00934': '中信成長高股息',
+            '00935': '野村臺灣新科技50', '00936': '台新永續高息中小', '00938': '凱基優選30',
+            '00939': '統一台灣高息動能', '00940': '元大台灣價值高息', '00941': '中信上游半導體',
+            '00943': '兆豐電子高息等權', '00944': '野村趨勢動能高息', '00946': '群益科技高息成長',
+            // 債券 ETF
+            '00679B': '元大美債20年', '00687B': '國泰20年美債', '00696B': '富邦美債20年',
+            '00720B': '元大投資級公司債', '00725B': '國泰投資級公司債', '00740B': '富邦全球投等債',
+            '00751B': '元大AAA至A公司債', '00764B': '群益25年美債', '00772B': '中信高評級公司債',
+            '00773B': '中信優先金融債', '00795B': '中信美國公債20年', '00931B': '統一美債20年',
+            '00933B': '國泰10Y+金融債', '00937B': '群益ESG投等債20+',
+            // 電子權值 / 半導體 / AI 伺服器
+            '2330': '台積電', '2317': '鴻海', '2454': '聯發科', '2308': '台達電',
+            '2303': '聯電', '3711': '日月光投控', '2382': '廣達', '3231': '緯創',
+            '6669': '緯穎', '2357': '華碩', '2376': '技嘉', '2377': '微星',
+            '2324': '仁寶', '2356': '英業達', '4938': '和碩', '2301': '光寶科',
+            '2395': '研華', '3008': '大立光', '3034': '聯詠', '2379': '瑞昱',
+            '3037': '欣興', '3045': '台灣大', '2412': '中華電', '4904': '遠傳',
+            '2327': '國巨', '2345': '智邦', '3017': '奇鋐', '3324': '雙鴻',
+            '2383': '台光電', '2368': '金像電', '3661': '世芯-KY', '3443': '創意',
+            '5269': '祥碩', '6415': '矽力*-KY', '3529': '力旺', '8069': '元太',
+            '3481': '群創', '2409': '友達', '2344': '華邦電', '2408': '南亞科',
+            '8299': '群聯', '3702': '大聯大', '3036': '文曄', '2353': '宏碁',
             // 金融股
-            '2881': '富邦金', '2882': '國泰金', '2891': '中信金', '2886': '兆豐金', '2884': '玉山金',
-            '2892': '第一金', '2885': '元大金', '2880': '華南金', '5880': '合庫金', '2883': '開發金',
-            '2887': '台新金', '2890': '永豐金', '2888': '新光金', '2834': '臺企銀', '2801': '彰銀',
-            '2809': '京城銀', '2812': '台中銀', '5876': '上海商銀', '5871': '中租-KY',
-            // 傳產、航運、鋼鐵、食品
-            '2603': '長榮', '2609': '陽明', '2615': '萬海', '2618': '長榮航', '2610': '華航',
-            '2002': '中鋼', '1101': '台泥', '1102': '亞泥', '1301': '台塑', '1303': '南亞',
-            '1326': '台化', '6505': '台塑化', '1216': '統一', '2912': '統一超', '9910': '豐泰',
-            '9904': '寶成', '2207': '和泰車', '2105': '正新', '1605': '華新', '9945': '潤泰新'
+            '2881': '富邦金', '2882': '國泰金', '2891': '中信金', '2886': '兆豐金',
+            '2884': '玉山金', '2892': '第一金', '5880': '合庫金', '2880': '華南金',
+            '2885': '元大金', '2890': '永豐金', '2883': '開發金', '2887': '台新金',
+            '2888': '新光金', '2889': '國票金', '5876': '上海商銀', '2801': '彰銀',
+            '2834': '臺企銀', '2812': '台中銀', '2809': '京城銀', '2845': '遠東銀',
+            '5871': '中租-KY',
+            // 傳產 / 航運 / 重電 / 食品
+            '2603': '長榮', '2609': '陽明', '2615': '萬海', '2618': '長榮航',
+            '2610': '華航', '2002': '中鋼', '1101': '台泥', '1102': '亞泥',
+            '1301': '台塑', '1303': '南亞', '1326': '台化', '6505': '台塑化',
+            '1216': '統一', '2912': '統一超', '9910': '豐泰', '9904': '寶成',
+            '1513': '中興電', '1519': '華城', '1503': '士電', '1504': '東元',
+            '1605': '華新', '2207': '和泰車', '2201': '裕隆'
         };
 
-        let STOCK_CODE_DICTIONARY = { ...BASE_STOCK_DICTIONARY };
+        let STOCK_CODE_DICTIONARY = { ...DEFAULT_STOCK_DICTIONARY };
         let transactions = [];
         let currentPrices = {};
-        let feeDiscount = 6; // 預設手續費6折 (0 ~ 10)
-        let userGeminiApiKey = '';
+        let codeLookupTimer = null;
         let isBuyFeeManuallyEdited = false;
         let isSellFeeManuallyEdited = false;
-        let codeLookupTimer = null;
 
         // ==========================================
-        // 2. 初始化、資料讀寫與共用輔助函式
+        // 2. 初始化與資料讀寫
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('buy-date').value = today;
+
             loadData();
             populateStockDatalists();
-            initDefaultDates();
             bindEvents();
             renderAll();
         });
 
+        function populateStockDatalists() {
+            const codeDatalist = document.getElementById('stock-code-datalist');
+            const nameDatalist = document.getElementById('stock-name-datalist');
+            if (!codeDatalist || !nameDatalist) return;
+
+            const entries = Object.entries(STOCK_CODE_DICTIONARY);
+            codeDatalist.innerHTML = entries
+                .map(([code, name]) => `<option value="${code}">${name}</option>`)
+                .join('');
+            nameDatalist.innerHTML = entries
+                .map(([code, name]) => `<option value="${name}">${code}</option>`)
+                .join('');
+        }
+
+        function saveCustomStockToDict(code, name) {
+            if (!code || !name) return;
+            const cleanCode = code.trim().toUpperCase();
+            const cleanName = name.trim();
+            if (!cleanCode || !cleanName) return;
+
+            STOCK_CODE_DICTIONARY[cleanCode] = cleanName;
+            try {
+                const storedCustom = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM_DICT) || '{}');
+                storedCustom[cleanCode] = cleanName;
+                localStorage.setItem(STORAGE_KEY_CUSTOM_DICT, JSON.stringify(storedCustom));
+                populateStockDatalists();
+            } catch (e) {
+                console.warn('無法儲存自訂股票字典:', e);
+            }
+        }
+
         function loadData() {
             try {
-                const savedDict = localStorage.getItem(STORAGE_KEY_CUSTOM_DICT);
-                if (savedDict) {
-                    STOCK_CODE_DICTIONARY = { ...BASE_STOCK_DICTIONARY, ...JSON.parse(savedDict) };
+                const storedCustomDict = localStorage.getItem(STORAGE_KEY_CUSTOM_DICT);
+                if (storedCustomDict) {
+                    const parsedCustom = JSON.parse(storedCustomDict);
+                    STOCK_CODE_DICTIONARY = { ...DEFAULT_STOCK_DICTIONARY, ...parsedCustom };
                 }
 
-                const savedDiscount = localStorage.getItem(STORAGE_KEY_DISCOUNT);
-                if (savedDiscount !== null && !isNaN(parseFloat(savedDiscount))) {
-                    feeDiscount = parseFloat(savedDiscount);
+                const storedApiKey = localStorage.getItem(STORAGE_KEY_GEMINI_KEY);
+                if (storedApiKey) {
+                    userGeminiApiKey = storedApiKey;
+                }
+
+                const storedDiscount = localStorage.getItem(STORAGE_KEY_DISCOUNT);
+                if (storedDiscount !== null) {
+                    feeDiscount = parseFloat(storedDiscount);
                 }
                 updateDiscountLabel();
 
-                const savedKey = localStorage.getItem(STORAGE_KEY_API_KEY);
-                if (savedKey) {
-                    userGeminiApiKey = savedKey;
-                }
+                const storedTx = localStorage.getItem(STORAGE_KEY_TX);
+                const storedPrices = localStorage.getItem(STORAGE_KEY_PRICES);
 
-                const savedTx = localStorage.getItem(STORAGE_KEY_TX);
-                const savedPrices = localStorage.getItem(STORAGE_KEY_PRICES);
-
-                if (savedTx) {
-                    transactions = JSON.parse(savedTx);
-                    currentPrices = savedPrices ? JSON.parse(savedPrices) : {};
+                if (storedTx) {
+                    transactions = JSON.parse(storedTx);
+                    currentPrices = storedPrices ? JSON.parse(storedPrices) : {};
                 } else {
-                    // 預設示範資料
+                    // 預設範例資料
                     transactions = [
                         {
                             id: 'demo-1',
@@ -554,25 +614,25 @@
                         {
                             id: 'demo-2',
                             name: '0050 元大台灣50',
-                            buyDate: '2026-02-05',
+                            buyDate: '2026-02-10',
                             buyShares: 500,
                             buyPrice: 185,
                             buyFee: 79,
-                            sellDate: '',
-                            sellShares: 0,
-                            sellPrice: 0,
-                            sellFee: 0,
-                            sellTax: 0
+                            sellDate: '2026-03-05',
+                            sellShares: 500,
+                            sellPrice: 196,
+                            sellFee: 84,
+                            sellTax: 98
                         }
                     ];
                     currentPrices = {
-                        '2330 台積電': 1050,
-                        '0050 元大台灣50': 192
+                        '2330 台積電': 1045,
+                        '0050 元大台灣50': 198
                     };
                     saveData();
                 }
-            } catch (err) {
-                console.error('讀取本機資料失敗:', err);
+            } catch (e) {
+                console.error('讀取資料失敗:', e);
                 transactions = [];
                 currentPrices = {};
             }
@@ -582,58 +642,32 @@
             try {
                 localStorage.setItem(STORAGE_KEY_TX, JSON.stringify(transactions));
                 localStorage.setItem(STORAGE_KEY_PRICES, JSON.stringify(currentPrices));
-            } catch (err) {
-                console.error('儲存本機資料失敗:', err);
-            }
-        }
-
-        function saveCustomStockToDict(code, name) {
-            if (!code || !name) return;
-            const cleanCode = code.trim().toUpperCase();
-            const cleanName = name.replace(new RegExp(`^${cleanCode}\\s*`), '').trim();
-            if (!cleanName) return;
-
-            STOCK_CODE_DICTIONARY[cleanCode] = cleanName;
-            try {
-                const customOnly = {};
-                for (const [k, v] of Object.entries(STOCK_CODE_DICTIONARY)) {
-                    if (BASE_STOCK_DICTIONARY[k] !== v) {
-                        customOnly[k] = v;
-                    }
-                }
-                localStorage.setItem(STORAGE_KEY_CUSTOM_DICT, JSON.stringify(customOnly));
-                populateStockDatalists();
-            } catch (e) {}
-        }
-
-        function populateStockDatalists() {
-            const codeList = document.getElementById('stock-code-datalist');
-            const nameList = document.getElementById('stock-name-datalist');
-            if (!codeList || !nameList) return;
-
-            const entries = Object.entries(STOCK_CODE_DICTIONARY);
-            codeList.innerHTML = entries.map(([c, n]) => `<option value="${c}">${c} ${n}</option>`).join('');
-            nameList.innerHTML = entries.map(([c, n]) => `<option value="${n}">${c} ${n}</option>`).join('');
-        }
-
-        function initDefaultDates() {
-            const today = new Date().toISOString().split('T')[0];
-            const buyDateEl = document.getElementById('buy-date');
-            if (buyDateEl && !buyDateEl.value) {
-                buyDateEl.value = today;
+            } catch (e) {
+                console.error('儲存資料失敗:', e);
             }
         }
 
         function bindEvents() {
-            document.getElementById('buy-code').addEventListener('input', handleStockCodeInput);
-            document.getElementById('buy-name').addEventListener('input', handleStockNameInput);
+            // 股票代碼與名稱雙向連動（支援輸入與選單選擇）
+            const buyCodeEl = document.getElementById('buy-code');
+            const buyNameEl = document.getElementById('buy-name');
+
+            buyCodeEl.addEventListener('input', handleStockCodeInput);
+            buyCodeEl.addEventListener('change', handleStockCodeInput);
+            buyNameEl.addEventListener('input', handleStockNameInput);
+            buyNameEl.addEventListener('change', handleStockNameInput);
+
+            // 買入數量、單價、手續費即時試算
             document.getElementById('buy-shares').addEventListener('input', updateBuyPreview);
             document.getElementById('buy-price').addEventListener('input', updateBuyPreview);
             document.getElementById('buy-fee').addEventListener('input', () => {
                 isBuyFeeManuallyEdited = true;
             });
+
+            // 新增買入表單送出
             document.getElementById('buy-form').addEventListener('submit', handleAddBuy);
 
+            // 賣出表單即時試算與送出
             document.getElementById('sell-shares').addEventListener('input', () => {
                 isSellFeeManuallyEdited = false;
                 updateSellModalPreview();
@@ -653,62 +687,21 @@
             document.getElementById('sell-form').addEventListener('submit', handleSaveSell);
         }
 
-        function formatNumber(num) {
-            if (num === null || num === undefined || isNaN(num)) return '0';
-            return Number(num).toLocaleString('zh-TW', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            });
-        }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-
-            const toast = document.createElement('div');
-            const bgClass = type === 'error'
-                ? 'bg-rose-100 border-rose-600 text-rose-800'
-                : 'bg-[#FEF08A] border-[#45322E] text-[#45322E]';
-            const icon = type === 'error' ? '⚠️' : '🐱';
-
-            toast.className = `${bgClass} border-2 rounded-2xl px-4 py-2.5 shadow-[0_3px_0_#45322E] text-xs font-black flex items-center gap-2 transition-all duration-200`;
-            toast.innerHTML = `<span class="text-base">${icon}</span><span>${message}</span>`;
-
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(-8px)';
-                setTimeout(() => toast.remove(), 220);
-            }, 2600);
-        }
-
-        function scrollToSection(id) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-
         // ==========================================
-        // 手續費、證交稅試算與設定視窗
+        // 手續費與證交稅/管理費計算核心
         // ==========================================
+        function getTaxRateByStockName(stockName) {
+            const trimmed = (stockName || '').trim().toUpperCase();
+            if (/^00\d+B\b/.test(trimmed)) return 0; // 債券 ETF 免證交稅
+            if (/^00\d+/.test(trimmed)) return 0.001; // 一般股票 ETF 0.1%
+            return 0.003; // 一般個股 0.3%
+        }
+
         function estimateBrokerFee(amount) {
             if (!amount || amount <= 0 || feeDiscount <= 0) return 0;
             const discountMultiplier = feeDiscount / 10;
-            const rawFee = amount * 0.001425 * discountMultiplier;
-            return Math.max(1, Math.floor(rawFee));
-        }
-
-        function getTaxRateByStockName(stockName) {
-            if (!stockName) return 0.003;
-            const codeMatch = stockName.trim().match(/^([0-9]{4,6}[A-Za-z]?)/);
-            const code = codeMatch ? codeMatch[1].toUpperCase() : '';
-            // 債券 ETF (代號 00 開頭且含 B) 免證交稅
-            if (code.startsWith('00') && code.endsWith('B')) return 0;
-            // 一般股票型/高股息 ETF (00 開頭) 證交稅 0.1%
-            if (code.startsWith('00')) return 0.001;
-            // 一般個股證交稅 0.3%
-            return 0.003;
+            const rawFee = amount * BASE_BROKER_FEE_RATE * discountMultiplier;
+            return Math.max(1, Math.round(rawFee));
         }
 
         function estimateSellTax(stockName, amount) {
@@ -745,17 +738,18 @@
         }
 
         function saveFeeSettings() {
-            const inputVal = parseFloat(document.getElementById('fee-discount-input').value);
-            if (!isNaN(inputVal) && inputVal >= 0 && inputVal <= 10) {
-                feeDiscount = inputVal;
-                localStorage.setItem(STORAGE_KEY_DISCOUNT, String(feeDiscount));
-                updateDiscountLabel();
+            const val = parseFloat(document.getElementById('fee-discount-input').value);
+            if (isNaN(val) || val < 0 || val > 10) {
+                showToast('請輸入 0 到 10 之間的折數喔！', 'error');
+                return;
             }
+            feeDiscount = val;
+            userGeminiApiKey = (document.getElementById('gemini-apikey-input').value || '').trim();
 
-            const keyVal = document.getElementById('gemini-apikey-input').value.trim();
-            userGeminiApiKey = keyVal;
-            localStorage.setItem(STORAGE_KEY_API_KEY, userGeminiApiKey);
+            localStorage.setItem(STORAGE_KEY_DISCOUNT, String(feeDiscount));
+            localStorage.setItem(STORAGE_KEY_GEMINI_KEY, userGeminiApiKey);
 
+            updateDiscountLabel();
             isBuyFeeManuallyEdited = false;
             updateBuyPreview();
             closeFeeSettingsModal();
@@ -763,66 +757,79 @@
         }
 
         // ==========================================
-        // 3. 股票代碼與名稱雙向自動連動邏輯 (支援離線字典 + 多重公開報價源 + Gemini)
+        // 3. 股票代碼與名稱雙向自動連動邏輯 + 高速競速報價
         // ==========================================
-        async function fetchWithCorsFallback(targetUrl, timeoutMs = 6500) {
+        async function fetchJsonRace(targetUrl, timeoutMs = 4000) {
             const proxyBuilders = [
                 (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
                 (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
                 (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
             ];
 
-            for (const buildProxy of proxyBuilders) {
+            const tasks = proxyBuilders.map(async (buildProxy) => {
                 const controller = new AbortController();
                 const timer = setTimeout(() => controller.abort(), timeoutMs);
                 try {
                     const res = await fetch(buildProxy(targetUrl), { signal: controller.signal });
                     clearTimeout(timer);
-                    if (!res.ok) continue;
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
                     const text = await res.text();
-                    if (!text) continue;
+                    if (!text || text.trim().startsWith('<')) throw new Error('Invalid JSON');
                     return JSON.parse(text);
                 } catch (e) {
                     clearTimeout(timer);
+                    throw e;
                 }
+            });
+
+            try {
+                return await Promise.any(tasks);
+            } catch (e) {
+                return null;
             }
-            return null;
         }
 
         async function fetchStockInfoFromYahoo(code) {
-            const suffixes = ['TW', 'TWO'];
-            for (const suffix of suffixes) {
+            const querySymbol = async (suffix) => {
                 const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${code}.${suffix}?interval=1d&range=1d`;
-                const data = await fetchWithCorsFallback(yahooUrl);
+                const data = await fetchJsonRace(yahooUrl, 4000);
                 const meta = data?.chart?.result?.[0]?.meta;
                 if (meta && meta.regularMarketPrice && meta.regularMarketPrice > 0) {
-                    const name = (meta.shortName || meta.longName || '').trim();
                     return {
-                        name: name,
+                        name: (meta.shortName || meta.longName || '').trim(),
                         price: Number(meta.regularMarketPrice)
                     };
                 }
+                throw new Error('No Yahoo price');
+            };
+
+            try {
+                return await Promise.any([querySymbol('TW'), querySymbol('TWO')]);
+            } catch (e) {
+                return null;
             }
-            return null;
         }
 
-        async function fetchStockInfoFromPublicTwse(code) {
-            const yahooInfo = await fetchStockInfoFromYahoo(code);
-            if (yahooInfo && yahooInfo.price > 0) {
-                return yahooInfo;
+        async function fetchTwseAllDailyMap() {
+            try {
+                const data = await fetchJsonRace('https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL', 4500);
+                if (!Array.isArray(data)) return {};
+                const map = {};
+                data.forEach(row => {
+                    if (row.Code && row.ClosingPrice) {
+                        const p = parseFloat(row.ClosingPrice);
+                        if (!isNaN(p) && p > 0) {
+                            map[row.Code.trim().toUpperCase()] = {
+                                name: (row.Name || '').trim(),
+                                price: p
+                            };
+                        }
+                    }
+                });
+                return map;
+            } catch (e) {
+                return {};
             }
-
-            const targets = [`tse_${code}.tw`, `otc_${code}.tw`];
-            for (const target of targets) {
-                const twseUrl = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${target}&json=1&delay=0`;
-                const parsed = await fetchWithCorsFallback(twseUrl);
-                const info = parsed?.msgArray?.[0];
-                if (info && info.n) {
-                    const rawPrice = info.z && info.z !== '-' ? parseFloat(info.z) : (info.y && info.y !== '-' ? parseFloat(info.y) : null);
-                    return { name: info.n.trim(), price: rawPrice };
-                }
-            }
-            return null;
         }
 
         async function handleStockCodeInput(e) {
@@ -862,11 +869,11 @@
 
                 codeLookupTimer = setTimeout(async () => {
                     try {
-                        const twseInfo = await fetchStockInfoFromPublicTwse(code);
+                        const info = await fetchStockInfoFromYahoo(code);
                         const currentCode = document.getElementById('buy-code').value.trim().toUpperCase();
-                        if (twseInfo && twseInfo.name && currentCode === code) {
-                            nameInput.value = twseInfo.name;
-                            saveCustomStockToDict(code, twseInfo.name);
+                        if (info && info.name && currentCode === code) {
+                            nameInput.value = info.name;
+                            saveCustomStockToDict(code, info.name);
                             statusEl.classList.add('hidden');
                             return;
                         }
@@ -901,7 +908,7 @@
                     } finally {
                         statusEl.classList.add('hidden');
                     }
-                }, 450);
+                }, 400);
             } else {
                 statusEl.classList.add('hidden');
             }
@@ -1219,61 +1226,91 @@
 
             let updatedCount = 0;
 
+            // 最長 6.5 秒強制安全超時，絕對不會卡死轉圈圈
+            const runWithHardTimeout = async (promise, ms = 6500) => {
+                let timer;
+                const timeoutPromise = new Promise((_, reject) => {
+                    timer = setTimeout(() => reject(new Error('TIMEOUT')), ms);
+                });
+                try {
+                    return await Promise.race([promise, timeoutPromise]);
+                } finally {
+                    clearTimeout(timer);
+                }
+            };
+
             try {
-                const failedNames = [];
-                for (const stockName of stockNames) {
-                    const codeMatch = stockName.match(/^([0-9]{4,6}[A-Za-z]?)/);
-                    if (codeMatch) {
-                        const info = await fetchStockInfoFromPublicTwse(codeMatch[1].toUpperCase());
-                        if (info && info.price && info.price > 0) {
-                            currentPrices[stockName] = info.price;
+                await runWithHardTimeout((async () => {
+                    const failedNames = [];
+
+                    const results = await Promise.all(stockNames.map(async (stockName) => {
+                        const codeMatch = stockName.match(/^([0-9]{4,6}[A-Za-z]?)/);
+                        if (!codeMatch) return { stockName, price: null };
+                        const info = await fetchStockInfoFromYahoo(codeMatch[1].toUpperCase());
+                        return { stockName, code: codeMatch[1].toUpperCase(), price: info?.price || null };
+                    }));
+
+                    const unresolved = [];
+                    results.forEach(item => {
+                        if (item.price && item.price > 0) {
+                            currentPrices[item.stockName] = item.price;
                             updatedCount++;
                         } else {
-                            failedNames.push(stockName);
+                            unresolved.push(item);
                         }
-                    } else {
-                        failedNames.push(stockName);
-                    }
-                }
+                    });
 
-                const apiKey = userGeminiApiKey || "";
-                if (failedNames.length > 0 && apiKey) {
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-                    const prompt = `請查詢以下台灣股票或ETF的最新即時股價（或最近一個交易日的收盤價，純數字台幣元）：
+                    if (unresolved.length > 0) {
+                        const dailyMap = await fetchTwseAllDailyMap();
+                        unresolved.forEach(item => {
+                            if (item.code && dailyMap[item.code]?.price > 0) {
+                                currentPrices[item.stockName] = dailyMap[item.code].price;
+                                updatedCount++;
+                            } else {
+                                failedNames.push(item.stockName);
+                            }
+                        });
+                    }
+
+                    const apiKey = userGeminiApiKey || "";
+                    if (failedNames.length > 0 && apiKey) {
+                        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                        const prompt = `請查詢以下台灣股票或ETF的最新即時股價（或最近一個交易日的收盤價，純數字台幣元）：
 ${failedNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
 
 請嚴格回傳 JSON 格式陣列，不要包含任何 Markdown 標記或多餘文字，格式如下：
 [{"name": "股票名稱(需與上述完全一致)", "price": 股價數字}]`;
 
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            tools: [{ google_search: {} }]
-                        })
-                    });
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: prompt }] }],
+                                tools: [{ google_search: {} }]
+                            })
+                        });
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                        const jsonMatch = rawText.match(/\[[\s\S]*\]/);
-                        if (jsonMatch) {
-                            const parsedList = JSON.parse(jsonMatch[0]);
-                            parsedList.forEach(item => {
-                                if (item && item.name && typeof item.price === 'number' && item.price > 0) {
-                                    const matchedName = stockNames.find(
-                                        s => s === item.name || s.includes(item.name) || item.name.includes(s)
-                                    );
-                                    if (matchedName) {
-                                        currentPrices[matchedName] = item.price;
-                                        updatedCount++;
+                        if (response.ok) {
+                            const data = await response.json();
+                            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                            const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+                            if (jsonMatch) {
+                                const parsedList = JSON.parse(jsonMatch[0]);
+                                parsedList.forEach(item => {
+                                    if (item && item.name && typeof item.price === 'number' && item.price > 0) {
+                                        const matchedName = stockNames.find(
+                                            s => s === item.name || s.includes(item.name) || item.name.includes(s)
+                                        );
+                                        if (matchedName) {
+                                            currentPrices[matchedName] = item.price;
+                                            updatedCount++;
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     }
-                }
+                })(), 6500);
 
                 if (updatedCount > 0) {
                     saveData();
@@ -1282,11 +1319,17 @@ ${failedNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                     document.getElementById('last-price-update-time').textContent = `已於 ${nowStr} 自動更新最新報價`;
                     showToast(`已成功更新 ${updatedCount} 檔股票最新股價！`);
                 } else {
-                    showToast('目前無法取得外部即時報價，您可點擊現價欄位手動修改或至右上角設定 API Key！', 'error');
+                    showToast('目前外部報價源無回應，您可點擊現價欄位手動修改，或於右上角 ⚙️ 設定 API Key！', 'error');
                 }
             } catch (error) {
-                console.error('自動搜尋股價失敗:', error);
-                showToast('自動搜尋股價暫時無法連線，您可手動修改現價！', 'error');
+                console.warn('自動搜尋股價逾時或失敗:', error);
+                if (updatedCount > 0) {
+                    saveData();
+                    renderHoldings();
+                    showToast(`已更新部分 (${updatedCount} 檔) 股價！`);
+                } else {
+                    showToast('連線逾時，請稍後再試或直接點擊現價欄位手動輸入！', 'error');
+                }
             } finally {
                 btn.disabled = false;
                 btn.classList.remove('opacity-75');
@@ -1505,6 +1548,43 @@ ${failedNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
                     </div>
                 `;
             }).join('');
+        }
+
+        // ==========================================
+        // 7. 輔助函式
+        // ==========================================
+        function formatNumber(num) {
+            if (isNaN(num) || num === null) return '0';
+            return Number(num).toLocaleString('zh-TW', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                const y = el.getBoundingClientRect().top + window.scrollY - 76;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const isError = type === 'error';
+            const bgColor = isError ? 'bg-rose-100 border-rose-600 text-rose-900' : 'bg-[#FDE047] border-[#45322E] text-[#45322E]';
+            const emoji = isError ? '⚠️' : '✨';
+
+            toast.className = `${bgColor} border-2 px-4 py-2.5 rounded-2xl shadow-[0_3px_0_#45322E] text-xs font-black flex items-center justify-center gap-2 transition-all duration-300`;
+            toast.innerHTML = `<span>${emoji}</span><span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-8px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2600);
         }
     </script>
 </body>
