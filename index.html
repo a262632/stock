@@ -448,6 +448,321 @@
     <!-- JavaScript 邏輯 -->
     <script>
         // ==========================================
+        // 1. 狀態管理、預設資料與內建台股/ETF 字典
+        // ==========================================
+        const STORAGE_KEY_TX = 'cute_stock_tracker_transactions_v2';
+        const STORAGE_KEY_PRICES = 'cute_stock_tracker_prices_v2';
+        const STORAGE_KEY_DISCOUNT = 'cute_stock_tracker_fee_discount_v1';
+        const STORAGE_KEY_CUSTOM_DICT = 'cute_stock_tracker_custom_dict_v1';
+        const STORAGE_KEY_API_KEY = 'cute_stock_tracker_gemini_key_v1';
+
+        const BASE_STOCK_DICTIONARY = {
+            // 熱門 ETF 與高股息 / 債券 ETF
+            '0050': '元大台灣50', '0051': '元大中型100', '0052': '富邦科技', '0053': '元大電子',
+            '0055': '元大MSCI金融', '0056': '元大高股息', '006208': '富邦台50', '00631L': '元大台灣50正2',
+            '00632R': '元大台灣50反1', '00646': '元大S&P500', '00662': '富邦NASDAQ', '00679B': '元大美債20年',
+            '00687B': '國泰20年美債', '00692': '富邦公司治理', '00713': '元大台灣高息低波', '00720B': '元大投資級公司債',
+            '00733': '富邦臺灣中小', '00757': '統一FANG+', '00830': '國泰費城半導體', '00850': '元大臺灣ESG永續',
+            '00878': '國泰永續高股息', '00881': '國泰台灣5G+', '00891': '中信關鍵半導體', '00892': '富邦台灣半導體',
+            '00900': '富邦特選高股息30', '00912': '中信臺灣智慧50', '00915': '凱基優選高股息30', '00918': '大華優利高填息30',
+            '00919': '群益台灣精選高息', '00922': '國泰台灣領袖50', '00923': '群益台ESG低碳50', '00927': '群益半導體收益',
+            '00929': '復華台灣科技優息', '00930': '永豐ESG低碳高息', '00932': '兆豐永續高息等權', '00934': '中信成長高股息',
+            '00935': '野村臺灣新科技50', '00936': '台新永續高息中小', '00937B': '群益ESG投等債20+', '00939': '統一台灣高息動能',
+            '00940': '元大台灣價值高息', '00941': '中信上游半導體', '00944': '野村趨勢動能高息', '00946': '群益科技高息成長',
+            // 權值電子與半導體
+            '2330': '台積電', '2317': '鴻海', '2454': '聯發科', '2308': '台達電', '2303': '聯電',
+            '3711': '日月光投控', '2382': '廣達', '3231': '緯創', '6669': '緯穎', '2357': '華碩',
+            '2376': '技嘉', '2377': '微星', '2324': '仁寶', '4938': '和碩', '2356': '英業達',
+            '2301': '光寶科', '2345': '智邦', '3034': '聯詠', '2379': '瑞昱', '3037': '欣興',
+            '2368': '金像電', '3008': '大立光', '3443': '創意', '3661': '世芯-KY', '5269': '祥碩',
+            '3017': '奇鋐', '3324': '雙鴻', '2395': '研華', '2408': '南亞科', '2344': '華邦電',
+            '3481': '群創', '2409': '友達', '2412': '中華電', '3045': '台灣大', '4904': '遠傳',
+            '2327': '國巨', '2492': '華新科', '3533': '嘉澤', '2059': '川湖', '1513': '中興電',
+            '1519': '華城', '1503': '士電', '1504': '東元', '2371': '大同', '6446': '藥華藥',
+            // 金融股
+            '2881': '富邦金', '2882': '國泰金', '2891': '中信金', '2886': '兆豐金', '2884': '玉山金',
+            '2892': '第一金', '2885': '元大金', '2880': '華南金', '5880': '合庫金', '2883': '開發金',
+            '2887': '台新金', '2890': '永豐金', '2888': '新光金', '2834': '臺企銀', '2801': '彰銀',
+            '2809': '京城銀', '2812': '台中銀', '5876': '上海商銀', '5871': '中租-KY',
+            // 傳產、航運、鋼鐵、食品
+            '2603': '長榮', '2609': '陽明', '2615': '萬海', '2618': '長榮航', '2610': '華航',
+            '2002': '中鋼', '1101': '台泥', '1102': '亞泥', '1301': '台塑', '1303': '南亞',
+            '1326': '台化', '6505': '台塑化', '1216': '統一', '2912': '統一超', '9910': '豐泰',
+            '9904': '寶成', '2207': '和泰車', '2105': '正新', '1605': '華新', '9945': '潤泰新'
+        };
+
+        let STOCK_CODE_DICTIONARY = { ...BASE_STOCK_DICTIONARY };
+        let transactions = [];
+        let currentPrices = {};
+        let feeDiscount = 6; // 預設手續費6折 (0 ~ 10)
+        let userGeminiApiKey = '';
+        let isBuyFeeManuallyEdited = false;
+        let isSellFeeManuallyEdited = false;
+        let codeLookupTimer = null;
+
+        // ==========================================
+        // 2. 初始化、資料讀寫與共用輔助函式
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            populateStockDatalists();
+            initDefaultDates();
+            bindEvents();
+            renderAll();
+        });
+
+        function loadData() {
+            try {
+                const savedDict = localStorage.getItem(STORAGE_KEY_CUSTOM_DICT);
+                if (savedDict) {
+                    STOCK_CODE_DICTIONARY = { ...BASE_STOCK_DICTIONARY, ...JSON.parse(savedDict) };
+                }
+
+                const savedDiscount = localStorage.getItem(STORAGE_KEY_DISCOUNT);
+                if (savedDiscount !== null && !isNaN(parseFloat(savedDiscount))) {
+                    feeDiscount = parseFloat(savedDiscount);
+                }
+                updateDiscountLabel();
+
+                const savedKey = localStorage.getItem(STORAGE_KEY_API_KEY);
+                if (savedKey) {
+                    userGeminiApiKey = savedKey;
+                }
+
+                const savedTx = localStorage.getItem(STORAGE_KEY_TX);
+                const savedPrices = localStorage.getItem(STORAGE_KEY_PRICES);
+
+                if (savedTx) {
+                    transactions = JSON.parse(savedTx);
+                    currentPrices = savedPrices ? JSON.parse(savedPrices) : {};
+                } else {
+                    // 預設示範資料
+                    transactions = [
+                        {
+                            id: 'demo-1',
+                            name: '2330 台積電',
+                            buyDate: '2026-01-15',
+                            buyShares: 100,
+                            buyPrice: 980,
+                            buyFee: 84,
+                            sellDate: '',
+                            sellShares: 0,
+                            sellPrice: 0,
+                            sellFee: 0,
+                            sellTax: 0
+                        },
+                        {
+                            id: 'demo-2',
+                            name: '0050 元大台灣50',
+                            buyDate: '2026-02-05',
+                            buyShares: 500,
+                            buyPrice: 185,
+                            buyFee: 79,
+                            sellDate: '',
+                            sellShares: 0,
+                            sellPrice: 0,
+                            sellFee: 0,
+                            sellTax: 0
+                        }
+                    ];
+                    currentPrices = {
+                        '2330 台積電': 1050,
+                        '0050 元大台灣50': 192
+                    };
+                    saveData();
+                }
+            } catch (err) {
+                console.error('讀取本機資料失敗:', err);
+                transactions = [];
+                currentPrices = {};
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY_TX, JSON.stringify(transactions));
+                localStorage.setItem(STORAGE_KEY_PRICES, JSON.stringify(currentPrices));
+            } catch (err) {
+                console.error('儲存本機資料失敗:', err);
+            }
+        }
+
+        function saveCustomStockToDict(code, name) {
+            if (!code || !name) return;
+            const cleanCode = code.trim().toUpperCase();
+            const cleanName = name.replace(new RegExp(`^${cleanCode}\\s*`), '').trim();
+            if (!cleanName) return;
+
+            STOCK_CODE_DICTIONARY[cleanCode] = cleanName;
+            try {
+                const customOnly = {};
+                for (const [k, v] of Object.entries(STOCK_CODE_DICTIONARY)) {
+                    if (BASE_STOCK_DICTIONARY[k] !== v) {
+                        customOnly[k] = v;
+                    }
+                }
+                localStorage.setItem(STORAGE_KEY_CUSTOM_DICT, JSON.stringify(customOnly));
+                populateStockDatalists();
+            } catch (e) {}
+        }
+
+        function populateStockDatalists() {
+            const codeList = document.getElementById('stock-code-datalist');
+            const nameList = document.getElementById('stock-name-datalist');
+            if (!codeList || !nameList) return;
+
+            const entries = Object.entries(STOCK_CODE_DICTIONARY);
+            codeList.innerHTML = entries.map(([c, n]) => `<option value="${c}">${c} ${n}</option>`).join('');
+            nameList.innerHTML = entries.map(([c, n]) => `<option value="${n}">${c} ${n}</option>`).join('');
+        }
+
+        function initDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            const buyDateEl = document.getElementById('buy-date');
+            if (buyDateEl && !buyDateEl.value) {
+                buyDateEl.value = today;
+            }
+        }
+
+        function bindEvents() {
+            document.getElementById('buy-code').addEventListener('input', handleStockCodeInput);
+            document.getElementById('buy-name').addEventListener('input', handleStockNameInput);
+            document.getElementById('buy-shares').addEventListener('input', updateBuyPreview);
+            document.getElementById('buy-price').addEventListener('input', updateBuyPreview);
+            document.getElementById('buy-fee').addEventListener('input', () => {
+                isBuyFeeManuallyEdited = true;
+            });
+            document.getElementById('buy-form').addEventListener('submit', handleAddBuy);
+
+            document.getElementById('sell-shares').addEventListener('input', () => {
+                isSellFeeManuallyEdited = false;
+                updateSellModalPreview();
+            });
+            document.getElementById('sell-price').addEventListener('input', () => {
+                isSellFeeManuallyEdited = false;
+                updateSellModalPreview();
+            });
+            document.getElementById('sell-fee').addEventListener('input', () => {
+                isSellFeeManuallyEdited = true;
+                updateSellModalPreview();
+            });
+            document.getElementById('sell-tax').addEventListener('input', () => {
+                isSellFeeManuallyEdited = true;
+                updateSellModalPreview();
+            });
+            document.getElementById('sell-form').addEventListener('submit', handleSaveSell);
+        }
+
+        function formatNumber(num) {
+            if (num === null || num === undefined || isNaN(num)) return '0';
+            return Number(num).toLocaleString('zh-TW', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            const bgClass = type === 'error'
+                ? 'bg-rose-100 border-rose-600 text-rose-800'
+                : 'bg-[#FEF08A] border-[#45322E] text-[#45322E]';
+            const icon = type === 'error' ? '⚠️' : '🐱';
+
+            toast.className = `${bgClass} border-2 rounded-2xl px-4 py-2.5 shadow-[0_3px_0_#45322E] text-xs font-black flex items-center gap-2 transition-all duration-200`;
+            toast.innerHTML = `<span class="text-base">${icon}</span><span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-8px)';
+                setTimeout(() => toast.remove(), 220);
+            }, 2600);
+        }
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // ==========================================
+        // 手續費、證交稅試算與設定視窗
+        // ==========================================
+        function estimateBrokerFee(amount) {
+            if (!amount || amount <= 0 || feeDiscount <= 0) return 0;
+            const discountMultiplier = feeDiscount / 10;
+            const rawFee = amount * 0.001425 * discountMultiplier;
+            return Math.max(1, Math.floor(rawFee));
+        }
+
+        function getTaxRateByStockName(stockName) {
+            if (!stockName) return 0.003;
+            const codeMatch = stockName.trim().match(/^([0-9]{4,6}[A-Za-z]?)/);
+            const code = codeMatch ? codeMatch[1].toUpperCase() : '';
+            // 債券 ETF (代號 00 開頭且含 B) 免證交稅
+            if (code.startsWith('00') && code.endsWith('B')) return 0;
+            // 一般股票型/高股息 ETF (00 開頭) 證交稅 0.1%
+            if (code.startsWith('00')) return 0.001;
+            // 一般個股證交稅 0.3%
+            return 0.003;
+        }
+
+        function estimateSellTax(stockName, amount) {
+            if (!amount || amount <= 0) return 0;
+            const rate = getTaxRateByStockName(stockName);
+            if (rate <= 0) return 0;
+            return Math.floor(amount * rate);
+        }
+
+        function updateDiscountLabel() {
+            const label = document.getElementById('header-discount-label');
+            if (!label) return;
+            if (feeDiscount <= 0) {
+                label.textContent = '免手續費';
+            } else if (feeDiscount >= 10) {
+                label.textContent = '無折扣';
+            } else {
+                label.textContent = `手續費${feeDiscount}折`;
+            }
+        }
+
+        function openFeeSettingsModal() {
+            document.getElementById('fee-discount-input').value = feeDiscount;
+            document.getElementById('gemini-apikey-input').value = userGeminiApiKey;
+            document.getElementById('fee-settings-modal').classList.remove('hidden');
+        }
+
+        function closeFeeSettingsModal() {
+            document.getElementById('fee-settings-modal').classList.add('hidden');
+        }
+
+        function setQuickDiscount(val) {
+            document.getElementById('fee-discount-input').value = val;
+        }
+
+        function saveFeeSettings() {
+            const inputVal = parseFloat(document.getElementById('fee-discount-input').value);
+            if (!isNaN(inputVal) && inputVal >= 0 && inputVal <= 10) {
+                feeDiscount = inputVal;
+                localStorage.setItem(STORAGE_KEY_DISCOUNT, String(feeDiscount));
+                updateDiscountLabel();
+            }
+
+            const keyVal = document.getElementById('gemini-apikey-input').value.trim();
+            userGeminiApiKey = keyVal;
+            localStorage.setItem(STORAGE_KEY_API_KEY, userGeminiApiKey);
+
+            isBuyFeeManuallyEdited = false;
+            updateBuyPreview();
+            closeFeeSettingsModal();
+            showToast('設定已儲存！');
+        }
+
+        // ==========================================
         // 3. 股票代碼與名稱雙向自動連動邏輯 (支援離線字典 + 多重公開報價源 + Gemini)
         // ==========================================
         async function fetchWithCorsFallback(targetUrl, timeoutMs = 6500) {
@@ -475,7 +790,6 @@
         }
 
         async function fetchStockInfoFromYahoo(code) {
-            // 依序嘗試台灣上市 (.TW) 與上櫃 (.TWO)
             const suffixes = ['TW', 'TWO'];
             for (const suffix of suffixes) {
                 const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${code}.${suffix}?interval=1d&range=1d`;
@@ -493,13 +807,11 @@
         }
 
         async function fetchStockInfoFromPublicTwse(code) {
-            // 1. 優先透過 Yahoo Finance 公開報價接口 (盤中與盤後收盤皆有穩定價格，支援上市與上櫃)
             const yahooInfo = await fetchStockInfoFromYahoo(code);
             if (yahooInfo && yahooInfo.price > 0) {
                 return yahooInfo;
             }
 
-            // 2. 備援：台灣證交所 MIS 公開即時接口
             const targets = [`tse_${code}.tw`, `otc_${code}.tw`];
             for (const target of targets) {
                 const twseUrl = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${target}&json=1&delay=0`;
@@ -515,7 +827,6 @@
 
         async function handleStockCodeInput(e) {
             const rawVal = e.target.value.trim().toUpperCase();
-            // 若從 datalist 選取了 "0050 元大台灣50"，自動拆開代碼與名稱
             const spaceMatch = rawVal.match(/^([0-9]{4,6}[A-Z]?)\s+(.+)$/);
             if (spaceMatch) {
                 e.target.value = spaceMatch[1];
@@ -537,21 +848,20 @@
                 return;
             }
 
-            // 1. 優先比對內建與已快取字典 (部署後 100% 離線秒速連動)
+            // 1. 優先比對內建與已快取字典 (100% 離線秒速連動)
             if (STOCK_CODE_DICTIONARY[code]) {
                 nameInput.value = STOCK_CODE_DICTIONARY[code];
                 statusEl.classList.add('hidden');
                 return;
             }
 
-            // 2. 若不在字典中且符合台股代號格式，先查證交所公開資料，若有設定 API Key 則再用 Gemini 輔助
+            // 2. 若不在字典中且符合台股代號格式，自動查詢公開資料或 Gemini
             if (/^[0-9]{4,6}[A-Z]?$/.test(code)) {
                 statusEl.textContent = '查詢中...';
                 statusEl.classList.remove('hidden');
 
                 codeLookupTimer = setTimeout(async () => {
                     try {
-                        // 方法 A：免金鑰查詢台灣證交所/櫃買公開資料
                         const twseInfo = await fetchStockInfoFromPublicTwse(code);
                         const currentCode = document.getElementById('buy-code').value.trim().toUpperCase();
                         if (twseInfo && twseInfo.name && currentCode === code) {
@@ -561,7 +871,6 @@
                             return;
                         }
 
-                        // 方法 B：若有環境變數或使用者設定的 Gemini API Key，使用 Google Search 查詢
                         const apiKey = userGeminiApiKey || "";
                         if (apiKey) {
                             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -592,7 +901,7 @@
                     } finally {
                         statusEl.classList.add('hidden');
                     }
-                }, 500);
+                }, 450);
             } else {
                 statusEl.classList.add('hidden');
             }
@@ -611,7 +920,6 @@
                 return;
             }
 
-            // 完全比對或部分比對字典名稱反向帶入代碼
             for (const [dictCode, dictName] of Object.entries(STOCK_CODE_DICTIONARY)) {
                 if (dictName === val) {
                     codeInput.value = dictCode;
@@ -621,7 +929,7 @@
         }
 
         // ==========================================
-        // 4. 新增單筆購買
+        // 4. 新增單筆購買與即時試算
         // ==========================================
         function updateBuyPreview() {
             const shares = parseFloat(document.getElementById('buy-shares').value) || 0;
@@ -650,7 +958,6 @@
                 return;
             }
 
-            // 自動記憶這組新輸入的代號與名稱，下次輸入立即連動
             saveCustomStockToDict(code, stockTitle);
 
             const name = stockTitle.startsWith(code) ? stockTitle : `${code} ${stockTitle}`;
@@ -908,7 +1215,11 @@
             btn.disabled = true;
             btn.classList.add('opacity-75');
             icon.classList.add('animate-spin-fast');
-                // 優先嘗試免金鑰公開報價接口 (Yahoo Finance + 台灣證交所多通道備援)
+            text.textContent = '更新中...';
+
+            let updatedCount = 0;
+
+            try {
                 const failedNames = [];
                 for (const stockName of stockNames) {
                     const codeMatch = stockName.match(/^([0-9]{4,6}[A-Za-z]?)/);
@@ -925,13 +1236,11 @@
                     }
                 }
 
-                // 若仍有未更新到的股票，且有設定 Gemini API Key，則透過 Gemini + Google Search 查詢
-                const remainingNames = failedNames;
                 const apiKey = userGeminiApiKey || "";
-                if (remainingNames.length > 0 && apiKey) {
+                if (failedNames.length > 0 && apiKey) {
                     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
                     const prompt = `請查詢以下台灣股票或ETF的最新即時股價（或最近一個交易日的收盤價，純數字台幣元）：
-${remainingNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
+${failedNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
 
 請嚴格回傳 JSON 格式陣列，不要包含任何 Markdown 標記或多餘文字，格式如下：
 [{"name": "股票名稱(需與上述完全一致)", "price": 股價數字}]`;
@@ -989,7 +1298,9 @@ ${remainingNames.map((n, i) => `${i + 1}. ${n}`).join('\n')}
         function renderAll() {
             renderHoldings();
             renderTransactions();
-            lucide.createIcons();
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         }
 
         function renderHoldings() {
